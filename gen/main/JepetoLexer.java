@@ -1,4 +1,4 @@
-// Generated from D:/University/TA_Lessons/Compiler-1400-Spring/Jepeto-Phase1/src/main\Jepeto.g4 by ANTLR 4.8
+// Generated from D:/Term 6/compiler/Phase 1/src/main\Jepeto.g4 by ANTLR 4.8
 package main;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
