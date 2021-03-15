@@ -1,15 +1,10 @@
 grammar Jepeto;
 
-jepeto : program EOF;
+jepeto : program EOF;//done
 
-program : (functionDeclaration | main)*;
+program : (functionDeclaration)* main (functionDeclaration)*;//done
 
-//functionDeclaration : FUNC IDENTIFIER functionArgumentsDeclaration  COLON functionBody; //done
-
-//functionBody : statement | block; //done
-functionDeclaration : FUNC IDENTIFIER functionArgumentsDeclaration  COLON  functionBody;
-
-functionBody : (statement)* ;
+functionDeclaration : FUNC IDENTIFIER functionArgumentsDeclaration  COLON  statement;//done
 
 functionArgumentsDeclaration : LPAR (IDENTIFIER (COMMA IDENTIFIER)*)? RPAR ; // done
 
@@ -17,27 +12,27 @@ anonymousFunction :functionArgumentsDeclaration ARROW block; //done
 
 main : MAIN COLON (functionCallStatement | printStatement)? ; // done
 
-functionCall : IDENTIFIER LPAR functionArguments RPAR;
-
-// methodCall: otherExpression ((LPAR functionArguments RPAR) | (LBRACK expression RBRACK))* (LPAR functionArguments RPAR);
-singleArgument : expression | anonymousFunction;
-
-splitedExpressionsWithComma : (singleArgument (COMMA singleArgument)*)?; //done
-
-singleArgumentWithKey : IDENTIFIER ASSIGN expression | anonymousFunction;
-splitedExpressionsWithCommaAndKey : (singleArgumentWithKey (singleArgumentWithKey)*)?; //done
+functionCall : IDENTIFIER LPAR functionArguments RPAR; // Identifier -> otherExpression or not
 
 functionArguments : splitedExpressionsWithComma | splitedExpressionsWithCommaAndKey; //done
 
+splitedExpressionsWithComma : (singleArgument (COMMA singleArgument)*)?; //done
+
+singleArgument : expression | anonymousFunction;//done
+
+splitedExpressionsWithCommaAndKey : (singleArgumentWithKey (COMMA  singleArgumentWithKey)*)?; //done
+
+singleArgumentWithKey : IDENTIFIER ASSIGN (expression | anonymousFunction);//done
+
 functionCallStatement : functionCall SEMICOLLON; //done
+
 returnStatement : RETURN expression SEMICOLLON; //done
 
 ifStatement : IF expression COLON statement  (ELSE COLON statement )?; //done
 
 printStatement :  PRINT LPAR expression RPAR SEMICOLLON; //done
 
-
-statement: ifStatement | printStatement | functionCallStatement | returnStatement | block;
+statement: ifStatement | printStatement | functionCallStatement | returnStatement | block;//done
 
 block: LBRACE (statement)* RBRACE;//done
 
@@ -62,14 +57,14 @@ accessExpression: otherExpression ((LPAR functionArguments RPAR) | (LBRACK expre
 
 otherExpression: values | identifier | LPAR (expression) RPAR; //| anonymousFunction;
 
-sizeExpression: DOT SIZE;
+sizeExpression: DOT SIZE;//done
 
-appendExpression : APPEND expression;
+appendExpression : APPEND expression;//done
 
 
-values: boolValue | STRING_VALUE | INT_VALUE | listValue;
+values: boolValue | STRING_VALUE | INT_VALUE | listValue;//done
 
-listValue: LBRACK splitedExpressionsWithComma RBRACK;
+listValue: LBRACK splitedExpressionsWithComma RBRACK;//done
 
 boolValue : TRUE | FALSE ; //done
 

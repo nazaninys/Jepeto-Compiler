@@ -1,7 +1,8 @@
 
 func maxfinder(arr,i,equal,max):
      if arr.size < i:
-         return max;
+         return max
+
 
      else :
        maxfinder(arr,i+1,equal,equal(arr[i],arr[i+1]));

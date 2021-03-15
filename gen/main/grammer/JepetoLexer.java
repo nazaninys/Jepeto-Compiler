@@ -1,10 +1,13 @@
-// Generated from D:/Term 6/compiler/Phase 1/src/main\Jepeto.g4 by ANTLR 4.8
-package main;
+// Generated from D:/University/TA_Lessons/Compiler-1400-Spring/plc-spring1400-jepeto/src/main/grammer\Jepeto.g4 by ANTLR 4.8
+package main.grammer;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.*;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class JepetoLexer extends Lexer {
@@ -101,7 +104,7 @@ public class JepetoLexer extends Lexer {
 	}
 
 	@Override
-	public String getGrammarFileName() { return "main/grammer/Jepeto.g4"; }
+	public String getGrammarFileName() { return "Jepeto.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
