@@ -2,17 +2,23 @@ grammar Jepeto;
 
 jepeto : program EOF;//done
 
-program : (functionDeclaration)* main (functionDeclaration)*;//done
+program : (functionDeclaration)*  main  (functionDeclaration)*;//done
 
-functionDeclaration : FUNC IDENTIFIER functionArgumentsDeclaration  COLON  statement;//done
+functionDeclaration : FUNC IDENTIFIER functionArgumentsDeclaration  COLON  functionBody;
 
 functionArgumentsDeclaration : LPAR (IDENTIFIER (COMMA IDENTIFIER)*)? RPAR ; // done
 
-anonymousFunction :functionArgumentsDeclaration ARROW block; //done
+functionBody : singleStatement | block;
+
+singleStatement : returnStatement | ifStatementWithReturn;
+
+ifStatementWithReturn : IF expression COLON (singleStatement | block) ELSE COLON (singleStatement | block);
+
+block: LBRACE (((statement)* returnStatement (statement)*)+ | ifStatementWithReturn) RBRACE;
 
 main : MAIN COLON (functionCallStatement | printStatement)? ; // done
 
-functionCall : IDENTIFIER LPAR functionArguments RPAR; // Identifier -> otherExpression or not
+functionCall : otherExpression ((LPAR functionArguments RPAR) | (LBRACK expression RBRACK))* LPAR functionArguments RPAR; // Identifier -> otherExpression or not
 
 functionArguments : splitedExpressionsWithComma | splitedExpressionsWithCommaAndKey; //done
 
@@ -22,19 +28,19 @@ singleArgument : expression | anonymousFunction;//done
 
 splitedExpressionsWithCommaAndKey : (singleArgumentWithKey (COMMA  singleArgumentWithKey)*)?; //done
 
-singleArgumentWithKey : IDENTIFIER ASSIGN (expression | anonymousFunction);//done
+singleArgumentWithKey : identifier ASSIGN (expression | anonymousFunction);//done
 
 functionCallStatement : functionCall SEMICOLLON; //done
 
-returnStatement : RETURN expression SEMICOLLON; //done
+returnStatement : RETURN (expression)? SEMICOLLON; //done
 
-ifStatement : IF expression COLON statement  (ELSE COLON statement )?; //done
-
+ifStatement : IF expression COLON conditionBody   (ELSE COLON conditionBody)?; //done
+conditionBody : LBRACE (statement)* RBRACE | statement;
 printStatement :  PRINT LPAR expression RPAR SEMICOLLON; //done
 
-statement: ifStatement | printStatement | functionCallStatement | returnStatement | block;//done
+statement: ifStatement | printStatement | functionCallStatement | returnStatement;
 
-block: LBRACE (statement)* RBRACE;//done
+
 
 expression: orExpression (ASSIGN expression)?;//done
 
@@ -55,7 +61,8 @@ preUnaryExpression: ((NOT | MINUS ) preUnaryExpression) | accessExpression;//don
 accessExpression: otherExpression ((LPAR functionArguments RPAR) | (LBRACK expression RBRACK))*
                    (sizeExpression | appendExpression) ?;
 
-otherExpression: values | identifier | LPAR (expression) RPAR; //| anonymousFunction;
+otherExpression:  values | identifier | anonymousFunction | LPAR (expression) RPAR;
+anonymousFunction : functionArgumentsDeclaration ARROW block; //done
 
 sizeExpression: DOT SIZE;//done
 
