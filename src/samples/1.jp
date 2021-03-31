@@ -1,0 +1,19 @@
+main : print(4);
+
+func test() : {
+    if (a) :{
+        if (a):
+            if (1):
+                return 3;
+            else :
+                return 3;
+        else :
+            return 3;
+
+    }
+    return 4;
+}
+
+
+
+
