@@ -91,10 +91,10 @@ preUnaryExpression:
     | MINUS {System.out.println("Operator : -");}
     ) preUnaryExpression) | accessExpression;
 
-accessExpression: otherExpression ((LPAR functionArguments RPAR) | (LBRACK expression RBRACK))*
-                   (sizeExpression | appendExpression) ?;
+accessExpression: otherExpression ((LPAR functionArguments RPAR) | (LBRACK expression RBRACK) | appendExpression)*;
 
-otherExpression:  values | identifier | anonymousFunction | LPAR (expression) RPAR;
+
+otherExpression:  (values | identifier | anonymousFunction | LPAR (expression) RPAR) (sizeExpression) ?;
 
 anonymousFunction :
     {System.out.println("Anonymous Function");}
@@ -102,7 +102,7 @@ anonymousFunction :
 
 sizeExpression: DOT SIZE {System.out.println("Size");};
 
-appendExpression : APPEND {{System.out.println("Operator : ::");}} expression;
+appendExpression : APPEND {{System.out.println("Operator : ::");}} otherExpression;
 
 values: boolValue | STRING_VALUE | INT_VALUE | listValue;
 

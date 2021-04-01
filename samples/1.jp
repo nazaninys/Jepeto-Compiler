@@ -1,9 +1,1 @@
-func maxfinder(arr,i,equal,max):
-     if arr.size < i:
-         return max;
-
-     else :
-      return maxfinder(arr,i+1,equal,equal(arr[i],arr[i+1]));
-
-
-main: maxfinder(arr=[1,2,3,4,5],i=0,equal = (a,b)->{if a>b: return a; else: return b; },max=-1);
+main: print(b.size + 8 );
