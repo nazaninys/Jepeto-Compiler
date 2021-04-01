@@ -173,6 +173,12 @@ public interface JepetoVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPreUnaryExpression(JepetoParser.PreUnaryExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link JepetoParser#appendExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAppendExpression(JepetoParser.AppendExpressionContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link JepetoParser#accessExpression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -196,12 +202,6 @@ public interface JepetoVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitSizeExpression(JepetoParser.SizeExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link JepetoParser#appendExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAppendExpression(JepetoParser.AppendExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link JepetoParser#values}.
 	 * @param ctx the parse tree

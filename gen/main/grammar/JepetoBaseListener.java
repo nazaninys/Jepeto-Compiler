@@ -340,6 +340,18 @@ public class JepetoBaseListener implements JepetoListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterAppendExpression(JepetoParser.AppendExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAppendExpression(JepetoParser.AppendExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterAccessExpression(JepetoParser.AccessExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -383,18 +395,6 @@ public class JepetoBaseListener implements JepetoListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitSizeExpression(JepetoParser.SizeExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterAppendExpression(JepetoParser.AppendExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitAppendExpression(JepetoParser.AppendExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

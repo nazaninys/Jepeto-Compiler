@@ -278,6 +278,16 @@ public interface JepetoListener extends ParseTreeListener {
 	 */
 	void exitPreUnaryExpression(JepetoParser.PreUnaryExpressionContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link JepetoParser#appendExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterAppendExpression(JepetoParser.AppendExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link JepetoParser#appendExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitAppendExpression(JepetoParser.AppendExpressionContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link JepetoParser#accessExpression}.
 	 * @param ctx the parse tree
 	 */
@@ -317,16 +327,6 @@ public interface JepetoListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitSizeExpression(JepetoParser.SizeExpressionContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link JepetoParser#appendExpression}.
-	 * @param ctx the parse tree
-	 */
-	void enterAppendExpression(JepetoParser.AppendExpressionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link JepetoParser#appendExpression}.
-	 * @param ctx the parse tree
-	 */
-	void exitAppendExpression(JepetoParser.AppendExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link JepetoParser#values}.
 	 * @param ctx the parse tree

@@ -1,1 +1,1 @@
-main: print(b.size + 8 );
+main: print(a[5][7]::m[0][j]::o[i]::6.size);

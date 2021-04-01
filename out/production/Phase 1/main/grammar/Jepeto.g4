@@ -89,9 +89,13 @@ multiplicativeExpression:
 preUnaryExpression:
     ((NOT {System.out.println("Operator : ~");}
     | MINUS {System.out.println("Operator : -");}
-    ) preUnaryExpression) | accessExpression;
+    ) preUnaryExpression) | appendExpression;
 
-accessExpression: otherExpression ((LPAR functionArguments RPAR) | (LBRACK expression RBRACK) | appendExpression)*;
+appendExpression :
+    accessExpression (APPEND {System.out.println("Operator : ::");}
+     accessExpression)*;
+
+accessExpression: otherExpression ((LPAR functionArguments RPAR) | (LBRACK expression RBRACK))*;
 
 
 otherExpression:  (values | identifier | anonymousFunction | LPAR (expression) RPAR) (sizeExpression) ?;
@@ -101,8 +105,6 @@ anonymousFunction :
     functionArgumentsDeclaration ARROW block;
 
 sizeExpression: DOT SIZE {System.out.println("Size");};
-
-appendExpression : APPEND {{System.out.println("Operator : ::");}} otherExpression;
 
 values: boolValue | STRING_VALUE | INT_VALUE | listValue;
 
