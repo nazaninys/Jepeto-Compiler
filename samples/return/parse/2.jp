@@ -1,0 +1,9 @@
+func compare(a, b, msg) : {
+    if (a > b) : {
+        return "true";
+    }
+   return "false";
+   print(msg);
+}
+
+main : print(compare(2, 3));

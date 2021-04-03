@@ -1,0 +1,15 @@
+main : print(compare(2, 3));
+
+func compare(a, b, c) : {
+    if (a) :
+        print("hi");
+    else :
+        print("bye");
+    return true;
+    print(a + b);
+    return false;
+    if(b) :{
+        print(a+b+c);
+    }
+}
+

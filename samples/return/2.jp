@@ -1,0 +1,11 @@
+main : condition();
+
+func condition() : {
+    if (true) :
+        return void;
+    else :
+        if(a) :
+            return void;
+        else :
+            print("unreachable");
+}

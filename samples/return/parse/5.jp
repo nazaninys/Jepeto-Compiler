@@ -1,0 +1,18 @@
+main : print(compare(2, 3));
+
+func compare(a, b, c) :
+    if (a > b) :
+        if (b > c) : {
+            print(a);
+            return a;
+        }
+        else :
+            return c;
+    else : {
+        if (c > b) :
+            print(a + b);
+        else :
+            print("true");
+        return false;
+    }
+

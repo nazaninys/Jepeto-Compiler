@@ -1,0 +1,6 @@
+main : condition();
+
+func condition() : {
+    if (true) :
+        return void;
+}

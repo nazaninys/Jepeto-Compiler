@@ -1,0 +1,10 @@
+FunctionDec : compare
+ArgumentDec : a
+ArgumentDec : b
+Conditional : if
+Operator : >
+Return
+Conditional : else
+Return
+Main
+Built-in : print

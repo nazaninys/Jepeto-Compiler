@@ -45,7 +45,7 @@ public class JepetoTest {
     public void parse() throws Exception {
         args[2] = inputFile;
         jp.run(args);
-        Assert.assertEquals( outputStreamCaptor.toString().trim(), Files.readString(Path.of(outputFile)));
+        Assert.assertEquals(Files.readString(Path.of(outputFile)), outputStreamCaptor.toString().trim());
 
     }
 }
