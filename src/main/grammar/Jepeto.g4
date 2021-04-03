@@ -59,41 +59,36 @@ block: LBRACE (((statement)* returnStatement (statement)*)+ | ifStatementWithRet
 conditionBody : LBRACE (statement)* RBRACE | statement;
 
 expression:
-    andExpression (OR {System.out.println("Operator : or");}
-    andExpression)*;
+    andExpression (op = OR
+    andExpression {System.out.println("Operator : " + $op.text);} )*;
 
 andExpression:
-    equalityExpression (AND {System.out.println("Operator : and");}
-    equalityExpression)*;
+    equalityExpression (op = AND
+    equalityExpression {System.out.println("Operator : " + $op.text);} )*;
 
 equalityExpression:
-    relationalExpression ((EQUAL {System.out.println("Operator : is");}
-    | NOT_EQUAL {System.out.println("Operator : not");}
-    ) relationalExpression)*;
+    relationalExpression ((op = EQUAL | op = NOT_EQUAL)
+    relationalExpression {System.out.println("Operator : " + $op.text);} )*;
 
 relationalExpression:
-    additiveExpression ((GREATER_THAN {System.out.println("Operator : >");}
-    | LESS_THAN {System.out.println("Operator : <");}
-    ) additiveExpression)*;
+    additiveExpression ((op = GREATER_THAN | op = LESS_THAN)
+    additiveExpression {System.out.println("Operator : " + $op.text);} )*;
 
 additiveExpression:
-    multiplicativeExpression ((PLUS {System.out.println("Operator : +");}
-    | MINUS {System.out.println("Operator : -");}
-    ) multiplicativeExpression)*;
+    multiplicativeExpression ((op = PLUS | op = MINUS)
+    multiplicativeExpression {System.out.println("Operator : " + $op.text);} )*;
 
 multiplicativeExpression:
-    preUnaryExpression ((MULT {System.out.println("Operator : *");}
-    | DIVIDE {System.out.println("Operator : /");}
-    ) preUnaryExpression)*;
+    preUnaryExpression ((op = MULT | op = DIVIDE )
+    preUnaryExpression {System.out.println("Operator : " + $op.text);} )*;
 
 preUnaryExpression:
-    ((NOT {System.out.println("Operator : ~");}
-    | MINUS {System.out.println("Operator : -");}
-    ) preUnaryExpression) | appendExpression;
+    ((op = NOT | op = MINUS)
+    preUnaryExpression {System.out.println("Operator : " + $op.text);}) | appendExpression ;
 
 appendExpression :
-    accessExpression (APPEND {System.out.println("Operator : ::");}
-     accessExpression)*;
+    accessExpression (op = APPEND
+     accessExpression {System.out.println("Operator : " + $op.text);} )*;
 
 accessExpression: otherExpression  ((LPAR functionArguments RPAR) | (LBRACK expression RBRACK))* (sizeExpression) ?;
 
