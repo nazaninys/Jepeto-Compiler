@@ -185,6 +185,12 @@ public interface JepetoVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitAccessExpression(JepetoParser.AccessExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link JepetoParser#argumentExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitArgumentExpression(JepetoParser.ArgumentExpressionContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link JepetoParser#otherExpression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

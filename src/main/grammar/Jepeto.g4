@@ -95,10 +95,10 @@ appendExpression :
     accessExpression (APPEND {System.out.println("Operator : ::");}
      accessExpression)*;
 
-accessExpression: otherExpression ((LPAR functionArguments RPAR) | (LBRACK expression RBRACK))*;
+accessExpression: otherExpression  ((LPAR functionArguments RPAR) | (LBRACK expression RBRACK))* (sizeExpression) ?;
 
 
-otherExpression:  (values | identifier | anonymousFunction | LPAR (expression) RPAR) (sizeExpression) ?;
+otherExpression:  values | identifier | anonymousFunction | LPAR (expression) RPAR ;
 
 anonymousFunction :
     {System.out.println("Anonymous Function");}

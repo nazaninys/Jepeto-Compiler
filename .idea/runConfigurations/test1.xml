@@ -2,7 +2,7 @@
   <configuration default="false" name="test1" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="org.antlr.v4.gui.TestRig" />
     <module name="Phase 1" />
-    <option name="PROGRAM_PARAMETERS" value="main.grammar.Jepeto jepeto -gui samples/1.jp" />
+    <option name="PROGRAM_PARAMETERS" value="main.grammar.Jepeto jepeto -gui samples/2.jp" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

@@ -298,6 +298,16 @@ public interface JepetoListener extends ParseTreeListener {
 	 */
 	void exitAccessExpression(JepetoParser.AccessExpressionContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link JepetoParser#argumentExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterArgumentExpression(JepetoParser.ArgumentExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link JepetoParser#argumentExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitArgumentExpression(JepetoParser.ArgumentExpressionContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link JepetoParser#otherExpression}.
 	 * @param ctx the parse tree
 	 */

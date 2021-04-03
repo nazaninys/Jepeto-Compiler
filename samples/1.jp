@@ -1,1 +1,1 @@
-main: print(a[5][7]::m[0][j]::o[i]::6.size);
+main : print(20 + 10);
