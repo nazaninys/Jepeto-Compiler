@@ -14,7 +14,7 @@ public class JepetoRunner {
     }
 
     public static void main(String[] args) throws Exception {
-        CharStream reader = CharStreams.fromFileName("samples/1.jp");
+        CharStream reader = CharStreams.fromFileName("samples/condition/parse/1.jp");
         JepetoLexer jepetoLexer = new JepetoLexer(reader);
         CommonTokenStream tokenStream = new CommonTokenStream(jepetoLexer);
         JepetoParser jepetoParser = new JepetoParser(tokenStream);

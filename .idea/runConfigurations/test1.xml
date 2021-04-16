@@ -1,8 +1,11 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="test1" type="Application" factoryName="Application">
+    <output_file path="samples/out.txt" is_save="true" />
     <option name="MAIN_CLASS_NAME" value="org.antlr.v4.gui.TestRig" />
     <module name="Phase 1" />
-    <option name="PROGRAM_PARAMETERS" value="main.grammar.Jepeto jepeto samples/1.jp" />
+    <option name="PROGRAM_PARAMETERS" value="main.grammar.Jepeto jepeto " />
+    <option name="REDIRECT_INPUT" value="true" />
+    <option name="INPUT_FILE" value="samples/in.jp" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

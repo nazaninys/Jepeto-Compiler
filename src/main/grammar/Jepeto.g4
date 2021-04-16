@@ -24,9 +24,7 @@ functionArguments : splitedExpressionsWithComma | splitedExpressionsWithCommaAnd
 
 splitedExpressionsWithComma : (expression (COMMA expression)*)?;
 
-splitedExpressionsWithCommaAndKey : (singleArgumentWithKey (COMMA  singleArgumentWithKey)*)?;
-
-singleArgumentWithKey : identifier ASSIGN expression;
+splitedExpressionsWithCommaAndKey : (identifier ASSIGN expression (COMMA  identifier ASSIGN expression)*)?;
 
 functionCallStatement :
     {{System.out.println("FunctionCall");}}
@@ -41,6 +39,11 @@ ifStatement :
     expression COLON conditionBody   (ELSE {System.out.println("Conditional : else");}
     COLON conditionBody)?;
 
+ifStatementWithReturn :
+    IF {System.out.println("Conditional : if");}
+    expression COLON body ELSE {System.out.println("Conditional : else");}
+    COLON body;
+
 printStatement :
   PRINT {System.out.println("Built-in : print");}
   LPAR expression RPAR SEMICOLLON;
@@ -49,12 +52,9 @@ statement: ifStatement | printStatement | functionCallStatement | returnStatemen
 
 singleStatement : returnStatement | ifStatementWithReturn;
 
-ifStatementWithReturn :
-    IF {System.out.println("Conditional : if");}
-    expression COLON body ELSE {System.out.println("Conditional : else");}
-    COLON body;
+//block: LBRACE (((statement)* returnStatement (statement)*)+ | ifStatementWithReturn) RBRACE;
 
-block: LBRACE (((statement)* returnStatement (statement)*)+ | ifStatementWithReturn) RBRACE;
+block: LBRACE (statement* (returnStatement | ifStatementWithReturn) statement*) RBRACE;
 
 conditionBody : LBRACE (statement)* RBRACE | statement;
 
@@ -90,10 +90,9 @@ appendExpression :
     accessExpression (op = APPEND
      accessExpression {System.out.println("Operator : " + $op.text);} )*;
 
-accessExpression: otherExpression  ((LPAR functionArguments RPAR) | (LBRACK expression RBRACK))* (sizeExpression) ?;
+accessExpression: (otherExpression | anonymousFunction)  ((LPAR functionArguments RPAR) | (LBRACK expression RBRACK))* (sizeExpression)*;
 
-
-otherExpression:  values | identifier | anonymousFunction | LPAR (expression) RPAR ;
+otherExpression:  values | identifier | LPAR (expression) RPAR ;
 
 anonymousFunction :
     {System.out.println("Anonymous Function");}

@@ -1,0 +1,4 @@
+main : print(a);
+
+func f():
+    return;

@@ -37,7 +37,7 @@ public class JepetoTest {
         String path = "samples/";
         List<String[]> elements = new ArrayList<>();
         for(Integer i=1; i < 3; i ++)
-            elements.add(new String[]{path + i.toString() + ".jp", path + "ans-" + i.toString() + ".jp"});
+            elements.add(new String[]{path + i.toString() + ".jp", path + "ans-" + i.toString() + ".txt"});
         return elements;
     }
 
@@ -46,6 +46,5 @@ public class JepetoTest {
         args[2] = inputFile;
         jp.run(args);
         Assert.assertEquals(Files.readString(Path.of(outputFile)), outputStreamCaptor.toString().trim());
-
     }
 }

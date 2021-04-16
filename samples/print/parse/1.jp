@@ -1,0 +1,7 @@
+func f():{
+    print("hello");
+    print(true);
+    return void;
+}
+
+main : print(1);
