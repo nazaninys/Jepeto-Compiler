@@ -11,3 +11,5 @@ Built-in : print
 FunctionCall
 Main
 Built-in : print
+FunctionDec : g
+Return

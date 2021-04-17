@@ -11,3 +11,10 @@ func f(a, b, c):
 
 
 main: print(1);
+
+
+func g() : {
+    return 1;
+}
+
+

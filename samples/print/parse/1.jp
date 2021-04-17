@@ -1,6 +1,7 @@
 func f():{
     print("hello");
     print(true);
+    print("true");
     return void;
 }
 

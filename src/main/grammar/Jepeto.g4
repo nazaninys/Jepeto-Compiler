@@ -136,10 +136,6 @@ NOT: '~';
 
 APPEND: '::';
 
-BOOLEAN: 'boolean';
-STRING: 'string';
-INT: 'int';
-
 TRUE: 'true';
 FALSE: 'false';
 
