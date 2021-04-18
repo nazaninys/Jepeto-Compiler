@@ -1,0 +1,6 @@
+main : print(2);
+
+func f() : {
+    () -> {return 2;}();
+    return void;
+}

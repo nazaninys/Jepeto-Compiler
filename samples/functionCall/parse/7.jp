@@ -1,0 +1,6 @@
+main : f();
+
+func f() : {
+    (f()) (1, 2, 4);
+    return void;
+}
