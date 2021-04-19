@@ -1,0 +1,12 @@
+main : print(2);
+
+func f() : {
+    if(f();) : {
+        if(1):
+            print(3);
+        else :
+            print(4);
+    }
+    return void;
+
+}

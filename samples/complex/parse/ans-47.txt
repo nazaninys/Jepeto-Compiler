@@ -1,0 +1,49 @@
+Main
+FunctionCall
+FunctionDec : Main
+FunctionCall
+Operator : -
+Operator : -
+Operator : -
+Conditional : if
+Operator : -
+Operator : -
+Operator : -
+Operator : -
+Operator : /
+Operator : -
+Operator : -
+Operator : *
+Operator : -
+Return
+Operator : *
+Operator : ::
+Operator : *
+Operator : /
+Size
+Built-in : print
+Operator : *
+Operator : -
+Operator : /
+Conditional : else
+Conditional : if
+Operator : -
+Operator : -
+Operator : is
+Return
+Operator : +
+Size
+Operator : +
+Return
+Operator : and
+Operator : ::
+Operator : ::
+Operator : -
+Operator : -
+Operator : /
+Operator : or
+Return
+Operator : and
+Operator : ::
+Operator : -
+Operator : +
