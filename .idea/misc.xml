@@ -6,7 +6,7 @@
         <PerGrammarGenerationSettings>
           <option name="fileName" value="$PROJECT_DIR$/src/main/grammar/Jepeto.g4" />
           <option name="autoGen" value="true" />
-          <option name="outputDir" value="D:\Term 6\compiler\Phase 2\src" />
+          <option name="outputDir" value=".\src" />
           <option name="libDir" value="" />
           <option name="encoding" value="" />
           <option name="pkg" value="parsers" />

@@ -5,25 +5,32 @@ import main.ast.nodes.declaration.FunctionDeclaration;
 import main.ast.nodes.declaration.MainDeclaration;
 import main.ast.nodes.expression.*;
 import main.ast.nodes.statement.*;
+import main.compileError.CompileError;
+import main.compileError.nameError.*;
 import main.symbolTable.SymbolTable;
 import main.symbolTable.exceptions.ItemAlreadyExistsException;
 import main.symbolTable.exceptions.ItemNotFoundException;
 import main.symbolTable.items.FunctionSymbolTableItem;
 import main.symbolTable.items.SymbolTableItem;
 import main.symbolTable.items.VariableSymbolTableItem;
+
+import java.util.ArrayList;
 import java.util.Map;
 
 public class NameAnalyser extends Visitor<Void> {
     private int error;
+    private ArrayList<CompileError> nameErrors;
     private boolean fcall = false;
     private boolean funcDeclared;
     private FunctionDeclaration fdec;
 
-    public int getError() {return this.error;}
-
-    public SymbolTable getRoot(){
-        return SymbolTable.root;
+    public NameAnalyser(){
+        nameErrors = new ArrayList<>();
     }
+
+    public ArrayList<CompileError> getError() {return this.nameErrors;}
+
+
 
     @Override
     public Void visit(Program program) {
@@ -40,11 +47,12 @@ public class NameAnalyser extends Visitor<Void> {
 
             } catch (ItemAlreadyExistsException e) {
                 this.error += 1;
-                System.out.println("Line:" + funcDec.getLine() + ":" + "Duplicate function " + funcDec.getFunctionName().getName());
-                String newName = funcDec.getFunctionName().getName() + Integer.toString(this.error) + "@";
+                nameErrors.add(new DuplicateFunction(funcDec.getLine(), funcDec.getFunctionName().getName()));
+                String newName = funcDec.getFunctionName().getName() + this.error + "@";
                 funcDec.setFunctionName(new Identifier(newName));
                 try {
                     FunctionSymbolTableItem newFuncSym = new FunctionSymbolTableItem(funcDec);
+                    newFuncSym.setFunctionSymbolTable(newSymbolTable);
                     root.put(newFuncSym);
                 } catch (ItemAlreadyExistsException e1) { //Unreachable
                 }
@@ -52,6 +60,7 @@ public class NameAnalyser extends Visitor<Void> {
             SymbolTable.push(newSymbolTable);
         }
 
+        program.getMain().accept(this);
         for (FunctionDeclaration funcDec: program.getFunctions()){
             SymbolTableItem curSymbolTableItem;
             FunctionSymbolTableItem functionSymbolTableItem;
@@ -64,7 +73,7 @@ public class NameAnalyser extends Visitor<Void> {
             }catch (ItemNotFoundException e){ //Unreachable
             }
         }
-        program.getMain().accept(this);
+
 
         return null;
     }
@@ -85,15 +94,14 @@ public class NameAnalyser extends Visitor<Void> {
 
             } catch (ItemAlreadyExistsException e) {
                 error += 1;
-                System.out.println("Line:" + arg.getLine() + ":" + "Duplicate argument " + arg.getName());
+                nameErrors.add(new DuplicateArgument(arg.getLine(), arg.getName()));
             }
             try{
                 SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + arg.getName());
                 error += 1;
-                System.out.println("Line:" + arg.getLine() + ":" + "Name of argument " + arg.getName() +
-                        " conflicts with a function’s name");
+                nameErrors.add(new NameConflict(arg.getLine(), arg.getName()));
             }catch (ItemNotFoundException e) {
-
+                //unreachable
             }
         }
         funcDec.getBody().accept(this);
@@ -161,15 +169,17 @@ public class NameAnalyser extends Visitor<Void> {
 
             } catch (ItemAlreadyExistsException e) {
                 error += 1;
-                System.out.println("Line:" + arg.getLine() + ":" + "Duplicate argument " + arg.getName());
+                nameErrors.add(new DuplicateArgument(arg.getLine(), arg.getName()));
+                /*System.out.println("Line:" + arg.getLine() + ":" + "Duplicate argument " + arg.getName());*/
             }
             try{
                 SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + arg.getName());
                 error += 1;
-                System.out.println("Line:" + arg.getLine() + ":" + "Name of argument " + arg.getName() +
-                        " conflicts with a function’s name");
+                nameErrors.add(new NameConflict(arg.getLine(), arg.getName()));
+                /*System.out.println("Line:" + arg.getLine() + ":" + "Name of argument " + arg.getName() +
+                        " conflicts with a function’s name");*/
             }catch (ItemNotFoundException e) {
-
+                //unreachable
             }
         }
         anonymousFunction.getBody().accept(this);
@@ -186,8 +196,9 @@ public class NameAnalyser extends Visitor<Void> {
                 funcDeclared = true;
 
             }catch (ItemNotFoundException e) {
-                System.out.println("Line:" + identifier.getLine() + "Function " + identifier.getName()  +
-                        " not declared");
+                nameErrors.add(new FunctionNotDeclared(identifier.getLine(), identifier.getName()));
+                /*System.out.println("Line:" + identifier.getLine() + "Function " + identifier.getName()  +
+                        " not declared");*/
                 funcDeclared = false;
                 error += 1;
             }
@@ -201,8 +212,9 @@ public class NameAnalyser extends Visitor<Void> {
                 SymbolTable.top.getItem(VariableSymbolTableItem.START_KEY + identifier.getName());
 
             } catch (ItemNotFoundException e1) {
-                System.out.println("Line:" + identifier.getLine() + ":" + "Variable " + identifier.getName() +
-                        " not declared");
+                nameErrors.add(new VariableNotDeclared(identifier.getLine(), identifier.getName()));
+                /*System.out.println("Line:" + identifier.getLine() + ":" + "Variable " + identifier.getName() +
+                        " not declared");*/
                 error += 1;
             }
         }
@@ -237,15 +249,15 @@ public class NameAnalyser extends Visitor<Void> {
             boolean match = false;
             if (funcDeclared) {
                 for (Identifier id : fdec.getArgs()) {
-                    if (id.getName().equals(argsWithKey.getKey())) {
+                    if (id.getName().equals(argsWithKey.getKey().getName())) {
                         match = true;
                         break;
                     }
                 }
                 if(!match) {
-                    System.out.println("Line:" + argsWithKey.getKey().getLine() + ":Argument " +
-                            argsWithKey.getKey().getName() + " not declared in function " +
-                            fdec.getFunctionName().getName());
+                    nameErrors.add(new ArgumentNotDeclared( argsWithKey.getKey().getLine(),
+                                                            argsWithKey.getKey().getName(),
+                                                            fdec.getFunctionName().getName()));
                     error += 1;
                 }
             }

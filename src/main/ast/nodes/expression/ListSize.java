@@ -12,7 +12,7 @@ public class ListSize extends Expression {
     }
     @Override
     public String toString() {
-        return "listSize";
+        return "ListSize";
     }
 
     @Override

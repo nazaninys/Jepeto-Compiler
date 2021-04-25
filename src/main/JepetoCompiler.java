@@ -1,17 +1,19 @@
 package main;
 
 import main.ast.nodes.Program;
+import main.compileError.CompileError;
 import main.visitor.ASTTreePrinter;
 import main.visitor.ErrorReporter;
 import main.visitor.NameAnalyser;
 import main.visitor.Visitor;
-import main.visitor.typeVisitor.TypeMatch;
-import main.visitor.typeVisitor.TypeSetter;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import parsers.*;
 
+import java.util.ArrayList;
+
 public class JepetoCompiler {
+
     public void compile(CharStream textStream) {
         JepetoLexer jepetoLexer = new JepetoLexer(textStream);
         CommonTokenStream tokenStream = new CommonTokenStream(jepetoLexer);
@@ -19,9 +21,10 @@ public class JepetoCompiler {
         JepetoParser jepetoParser = new JepetoParser(tokenStream);
         Program program = jepetoParser.jepeto().jepetoProgram;
 //        ErrorReporter errorReporter = new ErrorReporter();
+
         NameAnalyser nameAnalyser = new NameAnalyser();
         program.accept(nameAnalyser);
-        if (nameAnalyser.getError() == 0) {
+        if (nameAnalyser.getError().size() == 0) {
 //            TypeMatch typeMatch = new TypeMatch();
 //            program.accept(typeMatch);
 //            int numberOfErrors = program.accept(errorReporter);
@@ -31,6 +34,11 @@ public class JepetoCompiler {
 //            program.accept(typeSetter);
             Visitor<Void> treePrinter = new ASTTreePrinter();
             program.accept(treePrinter);
+        }
+        else {
+            for (CompileError e: nameAnalyser.getError()) {
+                System.out.println(e.getMessage());
+            }
         }
 
     }

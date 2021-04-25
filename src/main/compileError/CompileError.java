@@ -2,14 +2,13 @@ package main.compileError;
 
 public class CompileError extends Exception {
     private int line;
-    private String message;
+    protected String message;
 
-    public CompileError(int line, String message) {
+    public CompileError(int line) {
         this.line = line;
-        this.message = message;
     }
 
     public String getMessage() {
-        return "Line:" + this.line + ":" + this.message;
+        return "Line " + line + ": " + message;
     }
 }
