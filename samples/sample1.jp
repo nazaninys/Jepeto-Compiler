@@ -1,0 +1,9 @@
+func f(a, b) : {
+    return void;
+}
+
+func ff() : {
+    return void;
+}
+
+main : ff(a = 2);

@@ -1,0 +1,4 @@
+func test(a) :{
+    return a[0][1]::3;
+}
+main: print(3);
