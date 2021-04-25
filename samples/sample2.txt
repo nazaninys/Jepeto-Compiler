@@ -1,6 +1,0 @@
-func testMethod(test1, test2, i):
-    if i not 10:
-       return testMethod (test1, test2::i::a.size, i+1);
-
-
-main: print(testMethod(10,[[2,3,4], 2, 4],0));
