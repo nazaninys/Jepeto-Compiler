@@ -18,19 +18,10 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class NameAnalyser extends Visitor<Void> {
-    private int error;
-    private ArrayList<CompileError> nameErrors;
+    private int error = 0;
     private boolean fcall = false;
     private boolean funcDeclared;
     private FunctionDeclaration fdec;
-
-    public NameAnalyser(){
-        nameErrors = new ArrayList<>();
-    }
-
-    public ArrayList<CompileError> getError() {return this.nameErrors;}
-
-
 
     @Override
     public Void visit(Program program) {
@@ -46,9 +37,10 @@ public class NameAnalyser extends Visitor<Void> {
                 root.put(newSymbolTableItem);
 
             } catch (ItemAlreadyExistsException e) {
-                this.error += 1;
-                nameErrors.add(new DuplicateFunction(funcDec.getLine(), funcDec.getFunctionName().getName()));
+                DuplicateFunction exception = new DuplicateFunction(funcDec.getLine(), funcDec.getFunctionName().getName());
+                funcDec.addError(exception);
                 String newName = funcDec.getFunctionName().getName() + this.error + "@";
+                error += 1;
                 funcDec.setFunctionName(new Identifier(newName));
                 try {
                     FunctionSymbolTableItem newFuncSym = new FunctionSymbolTableItem(funcDec);
@@ -93,13 +85,13 @@ public class NameAnalyser extends Visitor<Void> {
                 SymbolTable.top.put(varSym);
 
             } catch (ItemAlreadyExistsException e) {
-                error += 1;
-                nameErrors.add(new DuplicateArgument(arg.getLine(), arg.getName()));
+                DuplicateArgument exception = new DuplicateArgument(arg.getLine(), arg.getName());
+                funcDec.addError(exception);
             }
             try{
                 SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + arg.getName());
-                error += 1;
-                nameErrors.add(new NameConflict(arg.getLine(), arg.getName()));
+                NameConflict exception = new NameConflict(arg.getLine(), arg.getName());
+                funcDec.addError(exception);
             }catch (ItemNotFoundException e) {
                 //unreachable
             }
@@ -168,16 +160,13 @@ public class NameAnalyser extends Visitor<Void> {
                 SymbolTable.top.put(varSym);
 
             } catch (ItemAlreadyExistsException e) {
-                error += 1;
-                nameErrors.add(new DuplicateArgument(arg.getLine(), arg.getName()));
-                /*System.out.println("Line:" + arg.getLine() + ":" + "Duplicate argument " + arg.getName());*/
+                DuplicateArgument exception = new DuplicateArgument(arg.getLine(), arg.getName());
+                arg.addError(exception);
             }
             try{
                 SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + arg.getName());
-                error += 1;
-                nameErrors.add(new NameConflict(arg.getLine(), arg.getName()));
-                /*System.out.println("Line:" + arg.getLine() + ":" + "Name of argument " + arg.getName() +
-                        " conflicts with a function’s name");*/
+                NameConflict exception = new NameConflict(arg.getLine(), arg.getName());
+                arg.addError(exception);
             }catch (ItemNotFoundException e) {
                 //unreachable
             }
@@ -196,11 +185,10 @@ public class NameAnalyser extends Visitor<Void> {
                 funcDeclared = true;
 
             }catch (ItemNotFoundException e) {
-                nameErrors.add(new FunctionNotDeclared(identifier.getLine(), identifier.getName()));
-                /*System.out.println("Line:" + identifier.getLine() + "Function " + identifier.getName()  +
-                        " not declared");*/
+                FunctionNotDeclared exception = new FunctionNotDeclared(identifier.getLine(), identifier.getName());
+                identifier.addError(exception);
                 funcDeclared = false;
-                error += 1;
+
             }
             return null;
         }
@@ -212,10 +200,8 @@ public class NameAnalyser extends Visitor<Void> {
                 SymbolTable.top.getItem(VariableSymbolTableItem.START_KEY + identifier.getName());
 
             } catch (ItemNotFoundException e1) {
-                nameErrors.add(new VariableNotDeclared(identifier.getLine(), identifier.getName()));
-                /*System.out.println("Line:" + identifier.getLine() + ":" + "Variable " + identifier.getName() +
-                        " not declared");*/
-                error += 1;
+                VariableNotDeclared exception = new VariableNotDeclared(identifier.getLine(), identifier.getName());
+                identifier.addError(exception);
             }
         }
 
@@ -255,10 +241,10 @@ public class NameAnalyser extends Visitor<Void> {
                     }
                 }
                 if(!match) {
-                    nameErrors.add(new ArgumentNotDeclared( argsWithKey.getKey().getLine(),
-                                                            argsWithKey.getKey().getName(),
-                                                            fdec.getFunctionName().getName()));
-                    error += 1;
+                    ArgumentNotDeclared exception = new ArgumentNotDeclared(argsWithKey.getKey().getLine(),
+                            argsWithKey.getKey().getName(),
+                            fdec.getFunctionName().getName());
+                    funcCall.addError(exception);
                 }
             }
         }

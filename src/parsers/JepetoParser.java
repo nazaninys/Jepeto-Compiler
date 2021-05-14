@@ -9,6 +9,7 @@ package parsers;
      import main.ast.nodes.expression.values.primitive.*;
      import main.ast.nodes.statement.*;
      import java.util.ArrayList;
+     import java.util.LinkedHashMap;
      import java.util.HashMap;
      import java.util.Map;
  
@@ -879,7 +880,7 @@ public class JepetoParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			((SplitedExpressionsWithCommaAndKeyContext)_localctx).arguments =  new HashMap<>();
+			((SplitedExpressionsWithCommaAndKeyContext)_localctx).arguments =  new LinkedHashMap<>();
 			setState(200);
 			_errHandler.sync(this);
 			_la = _input.LA(1);

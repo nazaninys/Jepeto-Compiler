@@ -28,10 +28,11 @@ public class ErrorReporter extends Visitor<Integer> {
     @Override
     public Integer visit(Program program) {
         int numOfErrors = printErrors(program);
+        numOfErrors += program.getMain().accept(this);
         for(FunctionDeclaration funcDeclaration : program.getFunctions()) {
             numOfErrors += funcDeclaration.accept(this);
         }
-        numOfErrors += program.getMain().accept(this);
+
         return numOfErrors;
     }
 

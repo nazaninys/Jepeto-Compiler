@@ -1,8 +1,8 @@
 package main.ast.types;
 
-public class NullType extends Type {
+public class VoidType extends Type {
     @Override
     public String toString() {
-        return "NullType";
+        return "VoidType";
     }
 }

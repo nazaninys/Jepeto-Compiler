@@ -1,20 +1,22 @@
-main : f1(a = 2, b = "string");
+main : k();
 
 
-func f1(b, a, c) : {
-    print(a + b);
-    if (c) :
-        return a * b / b;
-    f2(a::b::(c or ~c)::a.size);
-    return a;
+
+func f(eq) : {
+    return eq;
 }
 
-func f2() :
-    return (a, b) -> {return a + b / a or b;};
+func g() : {
+    return k();
+    d();
 
-func f3(arg1, arg2) : {
-    print("Hello");
-    return 2 * arg1;
-    print(true);
-    print(arg2[arg1 or arg2]);
+
+}
+
+func k() : {
+   return f((a) ->{return a;});
+}
+
+func d() : {
+    return g();
 }

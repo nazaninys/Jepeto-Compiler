@@ -5,37 +5,18 @@ import main.ast.types.Type;
 import java.util.ArrayList;
 
 public class FptrType extends Type {
-    private ArrayList<Type> argumentsTypes = new ArrayList<>();
-    private Type returnType;
+    private String functionName;
 
-    public FptrType() {
+    public FptrType(String functionName) {
+        this.functionName = functionName;
     }
 
-    //empty ArrayList when no arguments
-    //NullType on returnType when void
-    public FptrType(ArrayList<Type> argumentsTypes, Type returnType) {
-        this.argumentsTypes = argumentsTypes;
-        this.returnType = returnType;
+    public String getFunctionName() {
+        return functionName;
     }
 
-    public ArrayList<Type> getArgumentsTypes() {
-        return argumentsTypes;
-    }
-
-    public void setArgumentsTypes(ArrayList<Type> argumentsTypes) {
-        this.argumentsTypes = argumentsTypes;
-    }
-
-    public Type getReturnType() {
-        return returnType;
-    }
-
-    public void setReturnType(Type returnType) {
-        this.returnType = returnType;
-    }
-
-    public void addArgumentType(Type type) {
-        this.argumentsTypes.add(type);
+    public void setFunctionName(String functionName) {
+        this.functionName = functionName;
     }
 
     @Override

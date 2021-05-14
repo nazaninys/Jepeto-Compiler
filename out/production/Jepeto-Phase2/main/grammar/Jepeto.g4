@@ -8,9 +8,7 @@ grammar Jepeto;
      import main.ast.nodes.expression.values.*;
      import main.ast.nodes.expression.values.primitive.*;
      import main.ast.nodes.statement.*;
-     import java.util.ArrayList;
-     import java.util.HashMap;
-     import java.util.Map;
+     import java.util.*;
  }
 
 jepeto returns [Program jepetoProgram] :
@@ -101,7 +99,7 @@ splitedExpressionsWithComma returns [ArrayList<Expression> arguments] :
     )*)?;
 
 splitedExpressionsWithCommaAndKey returns [Map<Identifier, Expression> arguments] :
-    {$arguments = new HashMap<>();}
+    {$arguments = new LinkedHashMap<>();}
     (id1 = identifier ASSIGN e1 = expression
     {$arguments.put($id1.idRet, $e1.expr);}
     (COMMA  id2 = identifier ASSIGN e2 = expression
