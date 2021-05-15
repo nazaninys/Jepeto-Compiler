@@ -10,6 +10,7 @@ import main.compileError.nameError.*;
 import main.symbolTable.SymbolTable;
 import main.symbolTable.exceptions.ItemAlreadyExistsException;
 import main.symbolTable.exceptions.ItemNotFoundException;
+import main.symbolTable.items.AnonymousSymbolTableItem;
 import main.symbolTable.items.FunctionSymbolTableItem;
 import main.symbolTable.items.SymbolTableItem;
 import main.symbolTable.items.VariableSymbolTableItem;
@@ -19,6 +20,7 @@ import java.util.Map;
 
 public class NameAnalyser extends Visitor<Void> {
     private int error = 0;
+    private int numOfAnonymous = 0;
     private boolean fcall = false;
     private boolean funcDeclared;
     private FunctionDeclaration fdec;
@@ -152,6 +154,9 @@ public class NameAnalyser extends Visitor<Void> {
     @Override
     public Void visit(AnonymousFunction anonymousFunction) {
         SymbolTable tempSymbolTable = new SymbolTable();
+        numOfAnonymous += 1;
+        AnonymousSymbolTableItem anonymousSymbolTableItem = new AnonymousSymbolTableItem(anonymousFunction,
+                String.valueOf(numOfAnonymous));
         SymbolTable.push(tempSymbolTable);
 
         for (Identifier arg: anonymousFunction.getArgs()) {
@@ -172,6 +177,13 @@ public class NameAnalyser extends Visitor<Void> {
             }
         }
         anonymousFunction.getBody().accept(this);
+        anonymousSymbolTableItem.setAnonymousSymbolTable(SymbolTable.top);
+        try {
+            SymbolTable.root.put(anonymousSymbolTableItem);
+
+        } catch (ItemAlreadyExistsException e) {
+            //unreachable
+        }
         SymbolTable.pop();
         return null;
     }
