@@ -55,7 +55,6 @@ public class TypeSetter  extends Visitor<Void> {
         for (int j=visitOrder.size() -1; j>=0 ; j--) {
             for (int i = visitOrder.get(j).size()-1; i >= 0; i--) {
                 try {
-
                     FunctionSymbolTableItem fitem = (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + visitOrder.get(j).get(i));
                     if (fitem.getReturnType() == null) {
                         visited.remove(visitOrder.get(j).get(i));

@@ -1,6 +1,7 @@
 package main.visitor;
 
 import main.ast.nodes.declaration.FunctionDeclaration;
+import main.ast.nodes.expression.AnonymousFunction;
 import main.ast.nodes.expression.Expression;
 import main.ast.nodes.expression.FunctionCall;
 import main.ast.nodes.expression.Identifier;
@@ -17,7 +18,9 @@ import main.ast.types.single.IntType;
 import main.ast.types.single.StringType;
 import main.symbolTable.SymbolTable;
 import main.symbolTable.exceptions.ItemNotFoundException;
+import main.symbolTable.items.AnonymousSymbolTableItem;
 import main.symbolTable.items.FunctionSymbolTableItem;
+import main.symbolTable.items.SymbolTableItem;
 import main.symbolTable.items.VariableSymbolTableItem;
 
 import java.util.*;
@@ -26,6 +29,7 @@ public class TypeInference extends Visitor<Type> {
     private SymbolTable functionSymbolTable;
     private Set<String> visited;
     private TypeSetter typeSetter;
+    private int numOfAnonymous = 0;
 
     public TypeInference(TypeSetter typeSetter) {
         this.typeSetter = typeSetter;
@@ -112,6 +116,14 @@ public class TypeInference extends Visitor<Type> {
                 fitem.getFuncDeclaration().accept(typeSetter);
                 return fitem.getReturnType();
             }catch (ItemNotFoundException e) {
+                try {
+
+                    AnonymousSymbolTableItem anonymousItem = (AnonymousSymbolTableItem) SymbolTable.root.getItem(
+                            AnonymousSymbolTableItem.START_KEY + ((FptrType) instaceType).getFunctionName());
+                }catch (ItemNotFoundException e1) {
+
+
+                }
 
             }
         }
@@ -137,20 +149,23 @@ public class TypeInference extends Visitor<Type> {
     }
 
     @Override
-    public Type visit(IntValue intValue) {
+    public Type visit(AnonymousFunction anonymousFunction) {
+        numOfAnonymous += 1;
+        return new FptrType(String.valueOf(numOfAnonymous));
+    }
 
+    @Override
+    public Type visit(IntValue intValue) {
         return new IntType();
     }
 
     @Override
     public Type visit(BoolValue boolValue) {
-
         return new BoolType();
     }
 
     @Override
     public Type visit(StringValue stringValue) {
-
         return new StringType();
     }
 
@@ -158,5 +173,4 @@ public class TypeInference extends Visitor<Type> {
     public Type visit(VoidValue voidValue) {
         return new VoidType();
     }
-
 }

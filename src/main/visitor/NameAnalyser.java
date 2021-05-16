@@ -19,9 +19,10 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class NameAnalyser extends Visitor<Void> {
-    private int error = 0;
+    private int newFunctionNameId = 1;
     private int numOfAnonymous = 0;
-    private boolean fcall = false;
+    private boolean isInFunctionCall = false;
+    private boolean isInstanceInArguments = false;
     private boolean funcDeclared;
     private FunctionDeclaration fdec;
 
@@ -41,8 +42,8 @@ public class NameAnalyser extends Visitor<Void> {
             } catch (ItemAlreadyExistsException e) {
                 DuplicateFunction exception = new DuplicateFunction(funcDec.getLine(), funcDec.getFunctionName().getName());
                 funcDec.addError(exception);
-                String newName = funcDec.getFunctionName().getName() + this.error + "@";
-                error += 1;
+                String newName = funcDec.getFunctionName().getName() + newFunctionNameId + "@";
+                newFunctionNameId += 1;
                 funcDec.setFunctionName(new Identifier(newName));
                 try {
                     FunctionSymbolTableItem newFuncSym = new FunctionSymbolTableItem(funcDec);
@@ -67,8 +68,6 @@ public class NameAnalyser extends Visitor<Void> {
             }catch (ItemNotFoundException e){ //Unreachable
             }
         }
-
-
         return null;
     }
 
@@ -76,7 +75,6 @@ public class NameAnalyser extends Visitor<Void> {
     public Void visit (MainDeclaration mainDeclaration) {
         mainDeclaration.getBody().accept(this);
         return null;
-
     }
 
     @Override
@@ -113,7 +111,6 @@ public class NameAnalyser extends Visitor<Void> {
     public Void visit(ConditionalStmt conditionalStmt) {
         conditionalStmt.getCondition().accept(this);
         conditionalStmt.getThenBody().accept(this);
-
         if(conditionalStmt.getElseBody() != null) {
             conditionalStmt.getElseBody().accept(this);
         }
@@ -153,6 +150,9 @@ public class NameAnalyser extends Visitor<Void> {
 
     @Override
     public Void visit(AnonymousFunction anonymousFunction) {
+        if (isInFunctionCall){
+            isInFunctionCall = false;
+        }
         SymbolTable tempSymbolTable = new SymbolTable();
         numOfAnonymous += 1;
         AnonymousSymbolTableItem anonymousSymbolTableItem = new AnonymousSymbolTableItem(anonymousFunction,
@@ -172,8 +172,7 @@ public class NameAnalyser extends Visitor<Void> {
                 SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + arg.getName());
                 NameConflict exception = new NameConflict(arg.getLine(), arg.getName());
                 arg.addError(exception);
-            }catch (ItemNotFoundException e) {
-                //unreachable
+            }catch (ItemNotFoundException e) {//unreachable
             }
         }
         anonymousFunction.getBody().accept(this);
@@ -181,8 +180,7 @@ public class NameAnalyser extends Visitor<Void> {
         try {
             SymbolTable.root.put(anonymousSymbolTableItem);
 
-        } catch (ItemAlreadyExistsException e) {
-            //unreachable
+        } catch (ItemAlreadyExistsException e) {//unreachable
         }
         SymbolTable.pop();
         return null;
@@ -190,34 +188,29 @@ public class NameAnalyser extends Visitor<Void> {
 
     @Override
     public Void visit(Identifier identifier) {
-        if (fcall) {
-            try{
-                FunctionSymbolTableItem fitem = (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + identifier.getName());
-                fdec = fitem.getFuncDeclaration();
-                funcDeclared = true;
-
-            }catch (ItemNotFoundException e) {
-                FunctionNotDeclared exception = new FunctionNotDeclared(identifier.getLine(), identifier.getName());
-                identifier.addError(exception);
-                funcDeclared = false;
-
-            }
-            return null;
-        }
         try{
-            SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + identifier.getName());
+            FunctionSymbolTableItem fitem = (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + identifier.getName());
+            fdec = fitem.getFuncDeclaration();
+            funcDeclared = true;
 
         }catch (ItemNotFoundException e) {
+            funcDeclared = false;
             try{
                 SymbolTable.top.getItem(VariableSymbolTableItem.START_KEY + identifier.getName());
-
+                if (isInFunctionCall){
+                    isInstanceInArguments = true;
+                }
             } catch (ItemNotFoundException e1) {
-                VariableNotDeclared exception = new VariableNotDeclared(identifier.getLine(), identifier.getName());
-                identifier.addError(exception);
+                if (isInFunctionCall) {
+                    FunctionNotDeclared exception = new FunctionNotDeclared(identifier.getLine(), identifier.getName());
+                    identifier.addError(exception);
+                }
+                else{
+                    VariableNotDeclared exception = new VariableNotDeclared(identifier.getLine(), identifier.getName());
+                    identifier.addError(exception);
+                }
             }
         }
-
-
         return null;
     }
 
@@ -236,16 +229,17 @@ public class NameAnalyser extends Visitor<Void> {
 
     @Override
     public Void visit(FunctionCall funcCall) {
-        fcall = true;
+        isInFunctionCall = true;
         funcCall.getInstance().accept(this);
-        fcall = false;
-        for (Expression args: funcCall.getArgs())
+        isInFunctionCall = false;
+
+        for (Expression args: funcCall.getArgs()) {
             args.accept(this);
+        }
         for (Map.Entry<Identifier,Expression> argsWithKey: funcCall.getArgsWithKey().entrySet()){
-            //argsWithKey.getKey().accept(this);
             argsWithKey.getValue().accept(this);
             boolean match = false;
-            if (funcDeclared) {
+            if (funcDeclared && !isInstanceInArguments) {
                 for (Identifier id : fdec.getArgs()) {
                     if (id.getName().equals(argsWithKey.getKey().getName())) {
                         match = true;
@@ -260,6 +254,8 @@ public class NameAnalyser extends Visitor<Void> {
                 }
             }
         }
+        funcDeclared = false;
+        isInstanceInArguments = false;
         return null;
     }
 }
