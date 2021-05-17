@@ -1,3 +1,6 @@
-Line 1: Argument a not declared in function f
-Line 1: Variable a not declared
-Line 1: Variable b not declared
+f
+Var_a : IntType
+Var_b : BoolType
+[IntType, BoolType]
+NoType
+Line 4: Unsupported operand type for operator add

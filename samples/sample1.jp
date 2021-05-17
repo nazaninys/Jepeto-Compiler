@@ -1,6 +1,5 @@
-main : f(a = a, b = b);
+main : f(1, true);
 
-func f(c, b) : {
-    f(b = b, c = c);
-    return f(c = b, b = c);
+func f(a, b) : {
+    return a + b;
 }
