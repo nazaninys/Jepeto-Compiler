@@ -1,21 +1,14 @@
 package main.visitor;
 
 import main.ast.nodes.Program;
-import main.ast.nodes.declaration.FunctionDeclaration;
-import main.ast.nodes.declaration.MainDeclaration;
+import main.ast.nodes.declaration.*;
 import main.ast.nodes.expression.*;
-import main.ast.nodes.expression.values.ListValue;
+import main.ast.nodes.expression.values.*;
 import main.ast.nodes.statement.*;
 import main.compileError.nameError.*;
-import main.symbolTable.SymbolTable;
-import main.symbolTable.exceptions.ItemAlreadyExistsException;
-import main.symbolTable.exceptions.ItemNotFoundException;
-import main.symbolTable.items.AnonymousSymbolTableItem;
-import main.symbolTable.items.FunctionSymbolTableItem;
-import main.symbolTable.items.SymbolTableItem;
-import main.symbolTable.items.VariableSymbolTableItem;
-
-
+import main.symbolTable.*;
+import main.symbolTable.exceptions.*;
+import main.symbolTable.items.*;
 import java.util.*;
 
 public class NameAnalyser extends Visitor<Void> {
@@ -23,7 +16,7 @@ public class NameAnalyser extends Visitor<Void> {
     private int numOfAnonymous = 0;
     private boolean isInFunctionCall = false;
     private boolean funcDeclared;
-    private FunctionDeclaration fdec;
+    private FunctionDeclaration curFunctionDec;
 
     @Override
     public Void visit(Program program) {
@@ -152,12 +145,19 @@ public class NameAnalyser extends Visitor<Void> {
         if (isInFunctionCall){
             isInFunctionCall = false;
         }
-        SymbolTable tempSymbolTable = new SymbolTable();
         numOfAnonymous += 1;
-        AnonymousSymbolTableItem anonymousSymbolTableItem = new AnonymousSymbolTableItem(anonymousFunction,
-                String.valueOf(numOfAnonymous));
-        SymbolTable.push(tempSymbolTable);
+        SymbolTable anonymousSymbolTable = new SymbolTable();
+        FunctionDeclaration anonymousDec = new FunctionDeclaration();
+        FunctionSymbolTableItem anonymousSymbolTableItem;
+        anonymousFunction.setName("anonymous" + numOfAnonymous);
 
+
+        anonymousDec.setFunctionName(new Identifier(anonymousFunction.getName()));
+        anonymousDec.setArgs(anonymousFunction.getArgs());
+        anonymousDec.setBody(anonymousFunction.getBody());
+        anonymousDec.setLine(anonymousFunction.getLine());
+
+        SymbolTable.push(anonymousSymbolTable);
         for (Identifier arg: anonymousFunction.getArgs()) {
             VariableSymbolTableItem varSym = new VariableSymbolTableItem(arg);
             try {
@@ -175,7 +175,10 @@ public class NameAnalyser extends Visitor<Void> {
             }
         }
         anonymousFunction.getBody().accept(this);
-        anonymousSymbolTableItem.setAnonymousSymbolTable(SymbolTable.top);
+
+        anonymousSymbolTableItem = new FunctionSymbolTableItem(anonymousDec);
+        anonymousSymbolTableItem.setFunctionSymbolTable(SymbolTable.top);
+
         try {
             SymbolTable.root.put(anonymousSymbolTableItem);
 
@@ -188,8 +191,8 @@ public class NameAnalyser extends Visitor<Void> {
     @Override
     public Void visit(Identifier identifier) {
         try{
-            FunctionSymbolTableItem fitem = (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + identifier.getName());
-            fdec = fitem.getFuncDeclaration();
+            FunctionSymbolTableItem fItem = (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + identifier.getName());
+            curFunctionDec = fItem.getFuncDeclaration();
             if(isInFunctionCall)
                 funcDeclared = true;
 
@@ -234,7 +237,7 @@ public class NameAnalyser extends Visitor<Void> {
         }
         Set<String> arguments = new HashSet<>();
         if (funcDeclared) {
-            for (Identifier id : fdec.getArgs())
+            for (Identifier id : curFunctionDec.getArgs())
                 arguments.add(id.getName());
         }
         for (Map.Entry<Identifier,Expression> argsWithKey: funcCall.getArgsWithKey().entrySet()){
@@ -243,7 +246,7 @@ public class NameAnalyser extends Visitor<Void> {
                 if ( ! arguments.contains(argsWithKey.getKey().getName())) {
                     ArgumentNotDeclared exception = new ArgumentNotDeclared(argsWithKey.getKey().getLine(),
                             argsWithKey.getKey().getName(),
-                            fdec.getFunctionName().getName());
+                            curFunctionDec.getFunctionName().getName());
                     funcCall.addError(exception);
                 }
             }

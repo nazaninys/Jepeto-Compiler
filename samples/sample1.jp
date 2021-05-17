@@ -1,6 +1,10 @@
-main : f(a = a, b = b);
+main : print(true);
 
-func f(c, b) : {
-    f(b = b, c = c);
-    return f(c = b, b = c);
+
+func f(c, a, b, c) : {
+    return 1;
+}
+
+func g(a, b) : {
+    return 2;
 }
