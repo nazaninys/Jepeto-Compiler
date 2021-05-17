@@ -15,6 +15,7 @@ import main.compileError.CompileError;
 
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class ErrorReporter extends Visitor<Integer> {
 
@@ -156,6 +157,11 @@ public class ErrorReporter extends Visitor<Integer> {
         numOfErrors += funcCall.getInstance().accept(this);
         for(Expression expression : funcCall.getArgs()) {
             numOfErrors += expression.accept(this);
+        }
+        for (Map.Entry<Identifier,Expression> argsWithKey: funcCall.getArgsWithKey().entrySet()){
+            numOfErrors += argsWithKey.getKey().accept(this);
+            numOfErrors += argsWithKey.getValue().accept(this);
+
         }
         return numOfErrors;
     }

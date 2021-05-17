@@ -4,8 +4,8 @@ import main.ast.nodes.Program;
 import main.ast.nodes.declaration.FunctionDeclaration;
 import main.ast.nodes.declaration.MainDeclaration;
 import main.ast.nodes.expression.*;
+import main.ast.nodes.expression.values.ListValue;
 import main.ast.nodes.statement.*;
-import main.compileError.CompileError;
 import main.compileError.nameError.*;
 import main.symbolTable.SymbolTable;
 import main.symbolTable.exceptions.ItemAlreadyExistsException;
@@ -15,14 +15,13 @@ import main.symbolTable.items.FunctionSymbolTableItem;
 import main.symbolTable.items.SymbolTableItem;
 import main.symbolTable.items.VariableSymbolTableItem;
 
-import java.util.ArrayList;
-import java.util.Map;
+
+import java.util.*;
 
 public class NameAnalyser extends Visitor<Void> {
     private int newFunctionNameId = 1;
     private int numOfAnonymous = 0;
     private boolean isInFunctionCall = false;
-    private boolean isInstanceInArguments = false;
     private boolean funcDeclared;
     private FunctionDeclaration fdec;
 
@@ -191,15 +190,12 @@ public class NameAnalyser extends Visitor<Void> {
         try{
             FunctionSymbolTableItem fitem = (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + identifier.getName());
             fdec = fitem.getFuncDeclaration();
-            funcDeclared = true;
+            if(isInFunctionCall)
+                funcDeclared = true;
 
         }catch (ItemNotFoundException e) {
-            funcDeclared = false;
             try{
                 SymbolTable.top.getItem(VariableSymbolTableItem.START_KEY + identifier.getName());
-                if (isInFunctionCall){
-                    isInstanceInArguments = true;
-                }
             } catch (ItemNotFoundException e1) {
                 if (isInFunctionCall) {
                     FunctionNotDeclared exception = new FunctionNotDeclared(identifier.getLine(), identifier.getName());
@@ -236,17 +232,15 @@ public class NameAnalyser extends Visitor<Void> {
         for (Expression args: funcCall.getArgs()) {
             args.accept(this);
         }
+        Set<String> arguments = new HashSet<>();
+        if (funcDeclared) {
+            for (Identifier id : fdec.getArgs())
+                arguments.add(id.getName());
+        }
         for (Map.Entry<Identifier,Expression> argsWithKey: funcCall.getArgsWithKey().entrySet()){
             argsWithKey.getValue().accept(this);
-            boolean match = false;
-            if (funcDeclared && !isInstanceInArguments) {
-                for (Identifier id : fdec.getArgs()) {
-                    if (id.getName().equals(argsWithKey.getKey().getName())) {
-                        match = true;
-                        break;
-                    }
-                }
-                if(!match) {
+            if (funcDeclared) {
+                if ( ! arguments.contains(argsWithKey.getKey().getName())) {
                     ArgumentNotDeclared exception = new ArgumentNotDeclared(argsWithKey.getKey().getLine(),
                             argsWithKey.getKey().getName(),
                             fdec.getFunctionName().getName());
@@ -255,7 +249,13 @@ public class NameAnalyser extends Visitor<Void> {
             }
         }
         funcDeclared = false;
-        isInstanceInArguments = false;
+        return null;
+    }
+
+    @Override
+    public Void visit(ListValue listValue) {
+        for (Expression element : listValue.getElements())
+            element.accept(this);
         return null;
     }
 }
