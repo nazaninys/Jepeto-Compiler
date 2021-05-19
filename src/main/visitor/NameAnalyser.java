@@ -16,7 +16,7 @@ public class NameAnalyser extends Visitor<Void> {
     private int numOfAnonymous = 0;
     private boolean isInFunctionCall = false;
     private boolean funcDeclared;
-    private FunctionDeclaration curFunctionDec;
+    private FunctionDeclaration fDec;
 
     @Override
     public Void visit(Program program) {
@@ -188,11 +188,12 @@ public class NameAnalyser extends Visitor<Void> {
         return null;
     }
 
+
     @Override
     public Void visit(Identifier identifier) {
         try{
             FunctionSymbolTableItem fItem = (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + identifier.getName());
-            curFunctionDec = fItem.getFuncDeclaration();
+            fDec = fItem.getFuncDeclaration();
             if(isInFunctionCall)
                 funcDeclared = true;
 
@@ -237,7 +238,7 @@ public class NameAnalyser extends Visitor<Void> {
         }
         Set<String> arguments = new HashSet<>();
         if (funcDeclared) {
-            for (Identifier id : curFunctionDec.getArgs())
+            for (Identifier id : fDec.getArgs())
                 arguments.add(id.getName());
         }
         for (Map.Entry<Identifier,Expression> argsWithKey: funcCall.getArgsWithKey().entrySet()){
@@ -246,7 +247,7 @@ public class NameAnalyser extends Visitor<Void> {
                 if ( ! arguments.contains(argsWithKey.getKey().getName())) {
                     ArgumentNotDeclared exception = new ArgumentNotDeclared(argsWithKey.getKey().getLine(),
                             argsWithKey.getKey().getName(),
-                            curFunctionDec.getFunctionName().getName());
+                            fDec.getFunctionName().getName());
                     funcCall.addError(exception);
                 }
             }

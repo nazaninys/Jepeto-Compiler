@@ -5,31 +5,19 @@ import main.ast.types.Type;
 import java.util.ArrayList;
 
 public class ListType extends Type {
-    private ArrayList<ListNameType> elementsTypes = new ArrayList<>();
+    private Type type;
 
-    public ListType() {
+
+    public ListType(Type type) {
+        this.type = type;
     }
 
-    public ListType(ArrayList<ListNameType> elementsTypes) {
-        this.elementsTypes = elementsTypes;
+    public Type getType() {
+        return type;
     }
 
-    public ListType(int listSize, ListNameType listNameType) {
-        for(int i=0; i < listSize; i++) {
-            elementsTypes.add(listNameType);
-        }
-    }
-
-    public ArrayList<ListNameType> getElementsTypes() {
-        return elementsTypes;
-    }
-
-    public void setElementsTypes(ArrayList<ListNameType> elementsTypes) {
-        this.elementsTypes = elementsTypes;
-    }
-
-    public void addElementType(ListNameType listNameType) {
-        this.elementsTypes.add(listNameType);
+    public void setType(Type type) {
+        this.type = type;
     }
 
     @Override

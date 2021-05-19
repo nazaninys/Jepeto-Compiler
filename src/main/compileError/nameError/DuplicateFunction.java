@@ -3,7 +3,6 @@ import main.compileError.CompileError;
 
 public class DuplicateFunction extends CompileError {
     public DuplicateFunction(int line, String functionName){
-        super(line);
-        message = "Duplicate function " + functionName;
+        super(line,"Duplicate function " + functionName);
     }
 }

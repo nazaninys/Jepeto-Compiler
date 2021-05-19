@@ -10,13 +10,13 @@ public class FunctionSymbolTableItem extends SymbolTableItem {
     public static final String START_KEY = "Function_";
     private SymbolTable FunctionSymbolTable;
     private FunctionDeclaration funcDeclaration;
-    private ArrayList<Type> argTypes;
+    private Map<String, Type> argTypes;
     private Type returnType;
 
     public FunctionSymbolTableItem(FunctionDeclaration funcDeclaration) {
         this.funcDeclaration = funcDeclaration;
         this.name = funcDeclaration.getFunctionName().getName();
-        argTypes = new ArrayList<>();
+        argTypes = new LinkedHashMap<>();
     }
 
     public SymbolTable getFunctionSymbolTable() {
@@ -35,11 +35,11 @@ public class FunctionSymbolTableItem extends SymbolTableItem {
         this.funcDeclaration = funcDeclaration;
     }
 
-    public void addArgType(Type type) {
-        argTypes.add(type);
+    public void addArgType(String name, Type type) {
+        argTypes.put(name, type);
     }
 
-    public ArrayList<Type> getArgTypes() {
+    public Map<String, Type> getArgTypes() {
         return argTypes;
     }
 

@@ -6,7 +6,7 @@ import main.visitor.IVisitor;
 import java.util.ArrayList;
 
 public class AnonymousFunction extends Expression {
-    private ArrayList<Identifier> args = new ArrayList<>();
+    private ArrayList<Identifier> args;
     private Statement body;
     private String name;
 
@@ -44,6 +44,4 @@ public class AnonymousFunction extends Expression {
     public <T> T accept(IVisitor<T> visitor) {
         return visitor.visit(this);
     }
-
-
 }

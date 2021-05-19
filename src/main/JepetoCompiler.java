@@ -24,10 +24,14 @@ public class JepetoCompiler {
         int numberOfErrors = program.accept(errorReporter);
         if(numberOfErrors > 0)
             System.exit(1);
-//        TypeSetter typeSetter = new TypeSetter();
-//        program.accept(typeSetter);
-        Visitor<Void> treePrinter = new ASTTreePrinter();
-        program.accept(treePrinter);
+        TypeSetter typeSetter = new TypeSetter();
+        program.accept(typeSetter);
+        TypeCheker typeCheker = new TypeCheker(typeSetter.getVisited());
+        program.accept(typeCheker);
+        numberOfErrors = program.accept(errorReporter);
+        if (numberOfErrors > 0)
+            System.exit(1);
+        System.out.println("Compilation successful");
 
     }
 

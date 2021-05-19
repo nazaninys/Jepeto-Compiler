@@ -3,7 +3,6 @@ import main.compileError.CompileError;
 
 public class VariableNotDeclared extends CompileError {
     public VariableNotDeclared(int line, String variableName){
-        super(line);
-        message = "Variable " + variableName + " not declared";
+        super(line,"Variable " + variableName + " not declared");
     }
 }
