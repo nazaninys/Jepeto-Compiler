@@ -1,28 +1,15 @@
 package main.visitor;
 
-import main.ast.nodes.declaration.FunctionDeclaration;
-import main.ast.nodes.expression.AnonymousFunction;
-import main.ast.nodes.expression.Expression;
-import main.ast.nodes.expression.FunctionCall;
-import main.ast.nodes.expression.Identifier;
-import main.ast.nodes.expression.values.VoidValue;
-import main.ast.nodes.expression.values.primitive.BoolValue;
-import main.ast.nodes.expression.values.primitive.IntValue;
-import main.ast.nodes.expression.values.primitive.StringValue;
-import main.ast.types.NoType;
-import main.ast.types.Type;
-import main.ast.types.VoidType;
+import main.ast.nodes.declaration.*;
+import main.ast.nodes.expression.*;
+import main.ast.nodes.expression.values.*;
+import main.ast.nodes.expression.values.primitive.*;
+import main.ast.types.*;
 import main.ast.types.functionPointer.FptrType;
-import main.ast.types.single.BoolType;
-import main.ast.types.single.IntType;
-import main.ast.types.single.StringType;
+import main.ast.types.single.*;
 import main.symbolTable.SymbolTable;
 import main.symbolTable.exceptions.ItemNotFoundException;
-import main.symbolTable.items.AnonymousSymbolTableItem;
-import main.symbolTable.items.FunctionSymbolTableItem;
-import main.symbolTable.items.SymbolTableItem;
-import main.symbolTable.items.VariableSymbolTableItem;
-
+import main.symbolTable.items.*;
 import java.util.*;
 
 public class TypeInference extends Visitor<Type> {
@@ -94,37 +81,30 @@ public class TypeInference extends Visitor<Type> {
 
     @Override
     public Type visit(FunctionCall funcCall) {
-        Type instaceType = funcCall.getInstance().accept(this);
-        if (instaceType instanceof FptrType) {
+        Type instanceType = funcCall.getInstance().accept(this);
+        ArrayList<Type> types = new ArrayList<>();
+        Map<String, Type> typesWithKey = new HashMap<>();
+        if (instanceType instanceof FptrType) {
+            for (Expression args : funcCall.getArgs()) {
+                types.add(args.accept(this));
+            }
+
+            for (Map.Entry<Identifier, Expression> argsWithKey : funcCall.getArgsWithKey().entrySet()) {
+                Type type = argsWithKey.getValue().accept(this);
+                typesWithKey.put(argsWithKey.getKey().getName(), type);
+            }
             try {
-                FunctionSymbolTableItem fitem = (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + ((FptrType) instaceType).getFunctionName());
+                String fKey = FunctionSymbolTableItem.START_KEY + ((FptrType) instanceType).getFunctionName();
+                FunctionSymbolTableItem fItem = (FunctionSymbolTableItem) SymbolTable.root.getItem(fKey);
 
-                ArrayList<Type> types = new ArrayList<>();
-                for (Expression args : funcCall.getArgs())
-                    types.add(args.accept(this));
-                Map<String, Type> typesWithKey = new HashMap<>();
-                for (Map.Entry<Identifier, Expression> argsWithKey : funcCall.getArgsWithKey().entrySet()) {
-                    Type type = argsWithKey.getValue().accept(this);
-                    typesWithKey.put(argsWithKey.getKey().getName(), type);
-
-
-                }
                 if(typesWithKey.size() != 0)
-                    setArgumentsTypeWithKey(fitem, typesWithKey);
+                    setArgumentsTypeWithKey(fItem, typesWithKey);
                 else
-                    setArgumentsType(fitem, types);
-                fitem.getFuncDeclaration().accept(typeSetter);
-                return fitem.getReturnType();
-            }catch (ItemNotFoundException e) {
-                try {
+                    setArgumentsType(fItem, types);
 
-                    AnonymousSymbolTableItem anonymousItem = (AnonymousSymbolTableItem) SymbolTable.root.getItem(
-                            AnonymousSymbolTableItem.START_KEY + ((FptrType) instaceType).getFunctionName());
-                }catch (ItemNotFoundException e1) {
-
-
-                }
-
+                fItem.getFuncDeclaration().accept(typeSetter);
+                return fItem.getReturnType();
+            }catch (ItemNotFoundException e) {//unreachable
             }
         }
         return null;
@@ -141,17 +121,14 @@ public class TypeInference extends Visitor<Type> {
                 VariableSymbolTableItem varSym = (VariableSymbolTableItem) functionSymbolTable.getItem(VariableSymbolTableItem.START_KEY + identifier.getName());
                 return varSym.getType();
             }catch (ItemNotFoundException e1) {
-
             }
-
         }
         return null;
     }
 
     @Override
     public Type visit(AnonymousFunction anonymousFunction) {
-        numOfAnonymous += 1;
-        return new FptrType(String.valueOf(numOfAnonymous));
+        return new FptrType(anonymousFunction.getName());
     }
 
     @Override
