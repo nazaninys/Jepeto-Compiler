@@ -24,9 +24,11 @@ import java.util.*;
 public class TypeCheker extends Visitor<Void> {
     private ExpressionTypeChecker expressionTypeChecker;
     private FunctionSymbolTableItem curFunction;
+    private Set<String> visited;
 
-    public TypeCheker() {
+    public TypeCheker(Set<String> visited) {
         expressionTypeChecker = new ExpressionTypeChecker();
+        this.visited = visited;
     }
 
 
@@ -98,7 +100,8 @@ public class TypeCheker extends Visitor<Void> {
     public Void visit(Program program) {
         program.getMain().accept(this);
         for (FunctionDeclaration funcDec: program.getFunctions())
-            funcDec.accept(this);
+            if (visited.contains(funcDec.getFunctionName().getName()))
+                funcDec.accept(this);
         return null;
     }
 

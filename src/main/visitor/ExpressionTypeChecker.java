@@ -191,7 +191,9 @@ public class ExpressionTypeChecker extends Visitor<Type>{
            VariableSymbolTableItem var = (VariableSymbolTableItem) curFunction.getFunctionSymbolTable().getItem(VariableSymbolTableItem.START_KEY + identifier.getName());
            return var.getType();
         } catch (ItemNotFoundException e1) {
-            return null;
+
+            return new FptrType(identifier.getName());
+
         }
 
     }

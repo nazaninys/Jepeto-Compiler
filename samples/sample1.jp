@@ -1,5 +1,23 @@
-main : f(1, true);
+main :  f();
 
-func f(a, b) : {
-    return a + b;
+func f() : {
+    return g();
+    return 10;
+}
+
+func g() : {
+    return k();
+    return d();
+}
+
+func k() : {
+    return f();
+}
+
+func d() : {
+    return g();
+}
+
+func novisit() : {
+    return 1 + true;
 }

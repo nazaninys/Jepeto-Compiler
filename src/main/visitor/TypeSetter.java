@@ -34,7 +34,9 @@ public class TypeSetter  extends Visitor<Void> {
         temp = new ArrayList<>();
     }
 
-
+    public Set<String> getVisited() {
+        return visited;
+    }
 
     private SymbolTable findFuncSymbolTable(Identifier name) {
         try {

@@ -26,10 +26,12 @@ public class JepetoCompiler {
             System.exit(1);
         TypeSetter typeSetter = new TypeSetter();
         program.accept(typeSetter);
-        TypeCheker typeCheker = new TypeCheker();
+        TypeCheker typeCheker = new TypeCheker(typeSetter.getVisited());
         program.accept(typeCheker);
         numberOfErrors = program.accept(errorReporter);
-        //ToDO compile successfull
+        if (numberOfErrors > 0)
+            System.exit(1);
+        System.out.println("Compilation successful");
 
     }
 
