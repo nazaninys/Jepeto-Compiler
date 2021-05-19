@@ -44,22 +44,9 @@ public class TypeCheker extends Visitor<Void> {
             return true;
         if ((lType instanceof StringType && !(rType instanceof StringType)))
             return true;
-//        if ((lType instanceof ListType && !(rType instanceof ListType)))
-//            return true;
-
-//        if(lType instanceof ListType && rType instanceof ListType){
-//            ArrayList<ListNameType> lList = ((ListType) lType).getElementsTypes();
-//            ArrayList<ListNameType> rList = ((ListType) rType).getElementsTypes();
-//            if(lList.size() != rList.size())
-//                return true;
-//            else {
-//                for(int i = 0; i < lList.size(); i++){
-//                    if(assignmentHasError(lList.get(i).getType(),rList.get(i).getType()))
-//                        return true;
-//                }
-//            }
-//
-//        }
+        if (lType instanceof ListType && rType instanceof ListType){
+            return assignmentHasError(((ListType) lType).getType(), ((ListType) rType).getType());
+        }
 
         if(lType instanceof FptrType){
             if(!(rType instanceof VoidType || rType instanceof FptrType))
@@ -67,8 +54,8 @@ public class TypeCheker extends Visitor<Void> {
             if(rType instanceof FptrType){
                 FunctionSymbolTableItem lfunc = findFunccSymobolTableItem((FptrType) lType);
                 FunctionSymbolTableItem rfunc = findFunccSymobolTableItem((FptrType) rType);
-                ArrayList<Type> leftArgsTypes = lfunc.getArgTypes();
-                ArrayList<Type> rightArgsTypes = rfunc.getArgTypes();
+                ArrayList<Type> leftArgsTypes = new ArrayList<>(lfunc.getArgTypes().values());
+                ArrayList<Type> rightArgsTypes = new ArrayList<>(rfunc.getArgTypes().values());
 
                 Type rightRetType = lfunc.getReturnType();
                 Type leftRetType = rfunc.getReturnType();
@@ -147,7 +134,9 @@ public class TypeCheker extends Visitor<Void> {
 
     @Override
     public Void visit(FunctionCallStmt funcCallStmt) {
+        expressionTypeChecker.setFunctioncallStmt(true);
         funcCallStmt.getFunctionCall().accept(this);
+        expressionTypeChecker.setFunctioncallStmt(false);
         return null;
     }
 

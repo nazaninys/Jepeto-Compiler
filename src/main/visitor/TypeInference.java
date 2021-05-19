@@ -53,7 +53,7 @@ public class TypeInference extends Visitor<Type> {
             try {
                 VariableSymbolTableItem varSym = (VariableSymbolTableItem) fitem.getFunctionSymbolTable().getItem(VariableSymbolTableItem.START_KEY +  fdec.getArgs().get(i).getName());
                 varSym.setType(types.get(i));
-                fitem.addArgType(types.get(i));
+                fitem.addArgType(fdec.getArgs().get(i).getName(), types.get(i));
             }catch(ItemNotFoundException e) {
 
             }
@@ -63,7 +63,7 @@ public class TypeInference extends Visitor<Type> {
                 try {
                     VariableSymbolTableItem varSym = (VariableSymbolTableItem) fitem.getFunctionSymbolTable().getItem(VariableSymbolTableItem.START_KEY + fdec.getArgs().get(i).getName());
                     varSym.setType(new NoType());
-                    fitem.addArgType(new NoType());
+                    fitem.addArgType(fdec.getArgs().get(i).getName(), new NoType());
                 }catch (ItemNotFoundException e) {
 
                 }
@@ -80,11 +80,11 @@ public class TypeInference extends Visitor<Type> {
                 VariableSymbolTableItem varSym = (VariableSymbolTableItem) fitem.getFunctionSymbolTable().getItem(VariableSymbolTableItem.START_KEY + arg.getName());
                 if(types.containsKey(arg.getName())) {
                     varSym.setType(types.get(arg.getName()));
-                    fitem.addArgType(types.get(arg.getName()));
+                    fitem.addArgType(arg.getName(), types.get(arg.getName()));
                 }
                 else {
                     varSym.setType(new NoType());
-                    fitem.addArgType(new NoType());
+                    fitem.addArgType(arg.getName(), new NoType());
                 }
             }catch (ItemNotFoundException e) {
 

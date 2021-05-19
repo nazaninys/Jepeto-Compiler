@@ -2,7 +2,9 @@ f
 []
 IntType
 g
-[]
+Var_a : IntType
+Var_b : NoType
+[IntType, NoType]
 IntType
 k
 []
@@ -13,8 +15,5 @@ IntType
 novisit
 []
 null
-Line 4: Return value does not match with function return type
-Line 9: Return value does not match with function return type
-Line 10: Return value does not match with function return type
-Line 14: Return value does not match with function return type
-Line 18: Return value does not match with function return type
+Line 4: Args in function call do not match with definition
+Line 18: Args in function call do not match with definition

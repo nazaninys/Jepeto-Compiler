@@ -29,6 +29,11 @@ import java.util.*;
 
 public class ExpressionTypeChecker extends Visitor<Type>{
     private FunctionSymbolTableItem curFunction;
+    private boolean isFunctioncallStmt;
+
+    public void setFunctioncallStmt(boolean isFunctioncallStmt) {
+        this.isFunctioncallStmt = isFunctioncallStmt;
+    }
 
     public void setCurFunction(FunctionSymbolTableItem curFunction) {
         this.curFunction = curFunction;
@@ -56,7 +61,7 @@ public class ExpressionTypeChecker extends Visitor<Type>{
             return true;
         if(el1 instanceof VoidType && el2 instanceof VoidType)
             return true;
-        //ToDo check
+        //ToDo check- typecheker assignmentHaserror ham hamine
         if (el1 instanceof ListType && el2 instanceof ListType){
             return sameType(((ListType) el1).getType(), ((ListType) el2).getType());
         }
@@ -67,8 +72,8 @@ public class ExpressionTypeChecker extends Visitor<Type>{
             Type el2RetType = f2.getReturnType();
             if(!sameType(el1RetType,el2RetType))
                 return false;
-            ArrayList<Type> el1ArgsTypes = f1.getArgTypes();
-            ArrayList<Type> el2ArgsTypes = f2.getArgTypes();
+            ArrayList<Type> el1ArgsTypes = new ArrayList<>(f1.getArgTypes().values());
+            ArrayList<Type> el2ArgsTypes = new ArrayList<>(f2.getArgTypes().values());
 
             if(el1ArgsTypes.size() != el2ArgsTypes.size())
                 return false;
@@ -200,7 +205,6 @@ public class ExpressionTypeChecker extends Visitor<Type>{
 
     @Override
     public Type visit(ListAccessByIndex listAccessByIndex) {
-        Expression index = listAccessByIndex.getIndex();
         Type indexType = listAccessByIndex.getIndex().accept(this);
         Type instanceType = listAccessByIndex.getInstance().accept(this);
 
@@ -243,6 +247,11 @@ public class ExpressionTypeChecker extends Visitor<Type>{
     public Type visit(FunctionCall funcCall) {
         Type type = funcCall.getInstance().accept(this);
         ArrayList<Type> rtypes = new ArrayList<>();
+        Map<String, Type> rtypesWithKey = new HashMap<>();
+        for (Map.Entry<Identifier,Expression> argsWithKey: funcCall.getArgsWithKey().entrySet()) {
+            Type curType = argsWithKey.getValue().accept(this);
+            rtypesWithKey.put(argsWithKey.getKey().getName(), curType);
+        }
         for (Expression expression : funcCall.getArgs()) {
             Type t = expression.accept(this);
             rtypes.add(t);
@@ -253,11 +262,61 @@ public class ExpressionTypeChecker extends Visitor<Type>{
             funcCall.addError(exception);
             return new NoType();
         }
-        //ToDo match definition - use value of void function
+        if (type instanceof FptrType) {
+            boolean declareError = false;
+            boolean error = false;
+            FunctionSymbolTableItem func = findFunccSymobolTableItem((FptrType) type);
+            if (func.getReturnType() instanceof VoidType && !isFunctioncallStmt) {
+                CantUseValueOfVoidFunction exception = new CantUseValueOfVoidFunction(funcCall.getLine());
+                funcCall.addError(exception);
+                error = true;
+            }
+            if(funcCall.getArgsWithKey().size() != 0) {
+                if(funcCall.getArgsWithKey().size() != func.getArgTypes().size()) {
+                    FunctionCallNotMatchDefinition exception = new FunctionCallNotMatchDefinition(funcCall.getLine());
+                    funcCall.addError(exception);
+                    error = true;
+                }
+            }
+            else if(funcCall.getArgs().size() != func.getArgTypes().size())
 
-        return null;
+                declareError = true;
 
+            else {
+                int i = 0;
+                for(Map.Entry<String, Type> ltype: func.getArgTypes().entrySet()) {
+                    if(!sameType(ltype.getValue(), rtypes.get(i))) {
+                        declareError = true;
+                        break;
+                    }
 
+                }
+                for(Map.Entry<String, Type> ltype: func.getArgTypes().entrySet()) {
+                    if(rtypesWithKey.containsKey(ltype.getKey())) {
+                        if(!sameType(rtypesWithKey.get(ltype.getKey()), ltype.getValue())) {
+                            declareError = true;
+                            break;
+                        }
+                    }
+                    else {
+
+                        declareError = true;
+                        break;
+                    }
+                }
+            }
+            if (declareError) {
+                FunctionCallNotMatchDefinition exception = new FunctionCallNotMatchDefinition(funcCall.getLine());
+                funcCall.addError(exception);
+            }
+            if (declareError || error)
+                return new NoType();
+            else
+                return func.getReturnType();
+
+        }
+        else
+            return new NoType();
     }
 
     @Override

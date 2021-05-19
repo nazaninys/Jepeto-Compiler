@@ -84,7 +84,7 @@ public class TypeSetter  extends Visitor<Void> {
 
                     }
                 }
-                System.out.println(fitem.getArgTypes());
+                System.out.println(fitem.getArgTypes().values());
                 System.out.println(fitem.getReturnType());
             }catch (ItemNotFoundException e) {
 

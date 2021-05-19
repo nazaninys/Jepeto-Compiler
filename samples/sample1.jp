@@ -1,11 +1,11 @@
 main :  f();
 
 func f() : {
-    return g();
+    return g(a = 1);
     return 10;
 }
 
-func g() : {
+func g(a, b) : {
     return k();
     return d();
 }
