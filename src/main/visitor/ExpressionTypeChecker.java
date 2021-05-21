@@ -30,6 +30,11 @@ import java.util.*;
 public class ExpressionTypeChecker extends Visitor<Type>{
     private FunctionSymbolTableItem curFunction;
     private boolean isFunctioncallStmt;
+    private boolean isMain;
+
+    public void setMain(boolean main) {
+        isMain = main;
+    }
 
     public void setFunctioncallStmt(boolean isFunctioncallStmt) {
         this.isFunctioncallStmt = isFunctioncallStmt;
@@ -90,7 +95,6 @@ public class ExpressionTypeChecker extends Visitor<Type>{
 
     @Override
     public Type visit(BinaryExpression binaryExpression) {
-        boolean rvalue = false;
         Expression left = binaryExpression.getFirstOperand();
         Expression right = binaryExpression.getSecondOperand();
 
@@ -192,11 +196,12 @@ public class ExpressionTypeChecker extends Visitor<Type>{
 
     @Override
     public Type visit(Identifier identifier) {
+        if (isMain)
+            return new FptrType(identifier.getName());
         try{
            VariableSymbolTableItem var = (VariableSymbolTableItem) curFunction.getFunctionSymbolTable().getItem(VariableSymbolTableItem.START_KEY + identifier.getName());
            return var.getType();
         } catch (ItemNotFoundException e1) {
-
             return new FptrType(identifier.getName());
 
         }
@@ -283,25 +288,29 @@ public class ExpressionTypeChecker extends Visitor<Type>{
                 declareError = true;
 
             else {
-                int i = 0;
-                for(Map.Entry<String, Type> ltype: func.getArgTypes().entrySet()) {
-                    if(!sameType(ltype.getValue(), rtypes.get(i))) {
-                        declareError = true;
-                        break;
-                    }
-
-                }
-                for(Map.Entry<String, Type> ltype: func.getArgTypes().entrySet()) {
-                    if(rtypesWithKey.containsKey(ltype.getKey())) {
-                        if(!sameType(rtypesWithKey.get(ltype.getKey()), ltype.getValue())) {
+                if(rtypes.size() != 0) {
+                    int i = 0;
+                    for (Map.Entry<String, Type> ltype : func.getArgTypes().entrySet()) {
+                        if (!sameType(ltype.getValue(), rtypes.get(i))) {
                             declareError = true;
                             break;
                         }
-                    }
-                    else {
+                        i++;
 
-                        declareError = true;
-                        break;
+                    }
+                }
+                if(rtypesWithKey.size() != 0) {
+                    for (Map.Entry<String, Type> ltype : func.getArgTypes().entrySet()) {
+                        if (rtypesWithKey.containsKey(ltype.getKey())) {
+                            if (!sameType(rtypesWithKey.get(ltype.getKey()), ltype.getValue())) {
+                                declareError = true;
+                                break;
+                            }
+                        } else {
+
+                            declareError = true;
+                            break;
+                        }
                     }
                 }
             }

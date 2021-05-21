@@ -1,23 +1,19 @@
-main :  f();
+main :  f(b = "str", a = true);
 
-func f() : {
-    return g(a = 1);
-    return 10;
+func f(a, b) : {
+    g(a, b);
+    if (a) :
+        return void;
+    else :
+        return a and b;
 }
 
-func g(a, b) : {
-    return k();
-    return d();
+func g(arg1, arg2) : {
+    print(f(arg1 + arg2 * arg1, "str2"));
+    return arg1;
 }
 
-func k() : {
-    return f();
-}
 
-func d() : {
-    return g();
-}
-
-func novisit() : {
+func noVisit(a, b) : {
     return 1 + true;
 }

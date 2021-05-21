@@ -103,7 +103,9 @@ public class TypeCheker extends Visitor<Void> {
 
     @Override
     public Void visit(MainDeclaration mainDeclaration) {
+        expressionTypeChecker.setMain(true);
         mainDeclaration.getBody().accept(this);
+        expressionTypeChecker.setMain(false);
         return null;
 
     }
@@ -135,7 +137,7 @@ public class TypeCheker extends Visitor<Void> {
     @Override
     public Void visit(FunctionCallStmt funcCallStmt) {
         expressionTypeChecker.setFunctioncallStmt(true);
-        funcCallStmt.getFunctionCall().accept(this);
+        funcCallStmt.getFunctionCall().accept(expressionTypeChecker);
         expressionTypeChecker.setFunctioncallStmt(false);
         return null;
     }

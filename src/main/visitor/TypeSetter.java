@@ -70,20 +70,13 @@ public class TypeSetter  extends Visitor<Void> {
             }
         }
         for (FunctionDeclaration funcDec : program.getFunctions()) {
+            if (! visited.contains(funcDec.getFunctionName().getName()))
+                continue;
             try {
                 FunctionSymbolTableItem fitem = (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + funcDec.getFunctionName().getName());
                 FunctionDeclaration fdec = fitem.getFuncDeclaration();
                 int i = 0;
                 System.out.println(fdec.getFunctionName().getName());
-                for (Identifier id: fdec.getArgs()) {
-                    try {
-                        VariableSymbolTableItem varSym = (VariableSymbolTableItem) fitem.getFunctionSymbolTable().getItem(VariableSymbolTableItem.START_KEY + id.getName());
-                        System.out.println(varSym.getKey() + " : " + varSym.getType());
-
-                    }catch(ItemNotFoundException e) {
-
-                    }
-                }
                 System.out.println(fitem.getArgTypes().values());
                 System.out.println(fitem.getReturnType());
             }catch (ItemNotFoundException e) {
