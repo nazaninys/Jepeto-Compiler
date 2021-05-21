@@ -1,4 +1,4 @@
-main :  f(b = "str", a = true);
+ main :  f(b = "str", a = true);
 
 func f(a, b) : {
     g(a, b);

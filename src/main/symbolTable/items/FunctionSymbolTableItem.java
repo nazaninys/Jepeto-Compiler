@@ -10,7 +10,7 @@ public class FunctionSymbolTableItem extends SymbolTableItem {
     public static final String START_KEY = "Function_";
     private SymbolTable FunctionSymbolTable;
     private FunctionDeclaration funcDeclaration;
-    private Map<String, Type> argTypes;
+    private final Map<String, Type> argTypes;
     private Type returnType;
 
     public FunctionSymbolTableItem(FunctionDeclaration funcDeclaration) {

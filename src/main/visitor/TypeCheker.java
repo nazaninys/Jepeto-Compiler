@@ -8,10 +8,8 @@ import main.ast.types.NoType;
 import main.ast.types.Type;
 import main.ast.types.VoidType;
 import main.ast.types.functionPointer.FptrType;
-import main.ast.types.list.ListNameType;
 import main.ast.types.list.ListType;
 import main.ast.types.single.BoolType;
-import main.ast.types.single.ClassType;
 import main.ast.types.single.IntType;
 import main.ast.types.single.StringType;
 import main.compileError.typeErrors.*;
@@ -31,7 +29,14 @@ public class TypeCheker extends Visitor<Void> {
         this.visited = visited;
     }
 
-
+    private FunctionSymbolTableItem findFuncSymbolTableItem(FptrType fptr) {
+        try{
+            String searchKey = FunctionSymbolTableItem.START_KEY + fptr.getFunctionName();
+            return (FunctionSymbolTableItem) SymbolTable.root.getItem(searchKey);
+        }catch (ItemNotFoundException e){
+            return null;
+        }
+    }
 
     public boolean assignmentHasError(Type lType, Type rType){
         if (lType instanceof NoType || rType instanceof NoType)
@@ -52,8 +57,8 @@ public class TypeCheker extends Visitor<Void> {
             if(!(rType instanceof VoidType || rType instanceof FptrType))
                 return true;
             if(rType instanceof FptrType){
-                FunctionSymbolTableItem lfunc = findFunccSymobolTableItem((FptrType) lType);
-                FunctionSymbolTableItem rfunc = findFunccSymobolTableItem((FptrType) rType);
+                FunctionSymbolTableItem lfunc = findFuncSymbolTableItem((FptrType) lType);
+                FunctionSymbolTableItem rfunc = findFuncSymbolTableItem((FptrType) rType);
                 ArrayList<Type> leftArgsTypes = new ArrayList<>(lfunc.getArgTypes().values());
                 ArrayList<Type> rightArgsTypes = new ArrayList<>(rfunc.getArgTypes().values());
 
@@ -72,17 +77,6 @@ public class TypeCheker extends Visitor<Void> {
         return false;
     }
 
-    private FunctionSymbolTableItem findFunccSymobolTableItem(FptrType fptr) {
-        try{
-            FunctionSymbolTableItem func = (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + fptr.getFunctionName());
-            return func;
-        }catch (ItemNotFoundException e){
-            return null;
-        }
-
-    }
-
-
     @Override
     public Void visit(Program program) {
         program.getMain().accept(this);
@@ -94,11 +88,10 @@ public class TypeCheker extends Visitor<Void> {
 
     @Override
     public Void visit(FunctionDeclaration funcDeclaration) {
-        curFunction = findFunccSymobolTableItem(new FptrType(funcDeclaration.getFunctionName().getName()));
+        curFunction = findFuncSymbolTableItem(new FptrType(funcDeclaration.getFunctionName().getName()));
         expressionTypeChecker.setCurFunction(curFunction);
         funcDeclaration.getBody().accept(this);
         return null;
-
     }
 
     @Override
@@ -109,7 +102,6 @@ public class TypeCheker extends Visitor<Void> {
         return null;
 
     }
-
 
     @Override
     public Void visit(BlockStmt blockStmt) {
@@ -136,9 +128,9 @@ public class TypeCheker extends Visitor<Void> {
 
     @Override
     public Void visit(FunctionCallStmt funcCallStmt) {
-        expressionTypeChecker.setFunctioncallStmt(true);
+        expressionTypeChecker.setFunctionCallStmt(true);
         funcCallStmt.getFunctionCall().accept(expressionTypeChecker);
-        expressionTypeChecker.setFunctioncallStmt(false);
+        expressionTypeChecker.setFunctionCallStmt(false);
         return null;
     }
 

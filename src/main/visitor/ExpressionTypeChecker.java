@@ -1,60 +1,46 @@
 package main.visitor;
 
 import main.ast.nodes.expression.*;
-import main.ast.nodes.expression.operators.BinaryOperator;
-import main.ast.nodes.expression.operators.UnaryOperator;
-import main.ast.nodes.expression.values.ListValue;
-import main.ast.nodes.expression.values.VoidValue;
-import main.ast.nodes.expression.values.primitive.BoolValue;
-import main.ast.nodes.expression.values.primitive.IntValue;
-import main.ast.nodes.expression.values.primitive.StringValue;
-import main.ast.types.NoType;
-import main.ast.types.Type;
-import main.ast.types.VoidType;
-import main.ast.types.functionPointer.FptrType;
-import main.ast.types.list.ListType;
-import main.ast.types.single.BoolType;
-import main.ast.types.single.ClassType;
-import main.ast.types.single.IntType;
-import main.ast.types.single.StringType;
-import main.compileError.nameError.FunctionNotDeclared;
-import main.compileError.nameError.VariableNotDeclared;
+import main.ast.nodes.expression.operators.*;
+import main.ast.nodes.expression.values.*;
+import main.ast.nodes.expression.values.primitive.*;
+import main.ast.types.*;
+import main.ast.types.functionPointer.*;
+import main.ast.types.list.*;
+import main.ast.types.single.*;
 import main.compileError.typeErrors.*;
-import main.symbolTable.SymbolTable;
-import main.symbolTable.exceptions.ItemNotFoundException;
-import main.symbolTable.items.FunctionSymbolTableItem;
-import main.symbolTable.items.VariableSymbolTableItem;
-
+import main.symbolTable.*;
+import main.symbolTable.exceptions.*;
+import main.symbolTable.items.*;
 import java.util.*;
 
 public class ExpressionTypeChecker extends Visitor<Type>{
     private FunctionSymbolTableItem curFunction;
-    private boolean isFunctioncallStmt;
+    private boolean isFunctionCallStmt;
     private boolean isMain;
 
     public void setMain(boolean main) {
         isMain = main;
     }
 
-    public void setFunctioncallStmt(boolean isFunctioncallStmt) {
-        this.isFunctioncallStmt = isFunctioncallStmt;
+    public void setFunctionCallStmt(boolean isFunctionCallStmt) {
+        this.isFunctionCallStmt = isFunctionCallStmt;
     }
 
     public void setCurFunction(FunctionSymbolTableItem curFunction) {
         this.curFunction = curFunction;
     }
 
-    private FunctionSymbolTableItem findFunccSymobolTableItem(FptrType fptr) {
+    private FunctionSymbolTableItem findFuncSymbolTableItem(FptrType fptr) {
         try{
-            FunctionSymbolTableItem func = (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + fptr.getFunctionName());
-            return func;
+            String searchKey = FunctionSymbolTableItem.START_KEY + fptr.getFunctionName();
+            return (FunctionSymbolTableItem) SymbolTable.root.getItem(searchKey);
         }catch (ItemNotFoundException e){
             return null;
         }
-
     }
 
-    private boolean sameType(Type el1,Type el2){
+    private boolean sameType(Type el1, Type el2){
 
         if(el1 instanceof NoType || el2 instanceof NoType)
             return true;
@@ -66,13 +52,13 @@ public class ExpressionTypeChecker extends Visitor<Type>{
             return true;
         if(el1 instanceof VoidType && el2 instanceof VoidType)
             return true;
-        //ToDo check- typecheker assignmentHaserror ham hamine
+        //ToDo check- typeChecker assignmentHasError ham hamine
         if (el1 instanceof ListType && el2 instanceof ListType){
             return sameType(((ListType) el1).getType(), ((ListType) el2).getType());
         }
         if(el1 instanceof FptrType && el2 instanceof FptrType){
-            FunctionSymbolTableItem f1 = findFunccSymobolTableItem((FptrType) el1);
-            FunctionSymbolTableItem f2 = findFunccSymobolTableItem((FptrType) el2);
+            FunctionSymbolTableItem f1 = findFuncSymbolTableItem((FptrType) el1);
+            FunctionSymbolTableItem f2 = findFuncSymbolTableItem((FptrType) el2);
             Type el1RetType = f1.getReturnType();
             Type el2RetType = f2.getReturnType();
             if(!sameType(el1RetType,el2RetType))
@@ -97,12 +83,11 @@ public class ExpressionTypeChecker extends Visitor<Type>{
     public Type visit(BinaryExpression binaryExpression) {
         Expression left = binaryExpression.getFirstOperand();
         Expression right = binaryExpression.getSecondOperand();
-
+        BinaryOperator operator =  binaryExpression.getBinaryOperator();
+        
         Type tl = left.accept(this);
         Type tr = right.accept(this);
-        BinaryOperator operator =  binaryExpression.getBinaryOperator();
-
-
+        
         if (operator.equals(BinaryOperator.and) || operator.equals(BinaryOperator.or)){
             if (tl instanceof BoolType && tr instanceof BoolType)
                 return new BoolType();
@@ -190,20 +175,31 @@ public class ExpressionTypeChecker extends Visitor<Type>{
 
     @Override
     public Type visit(AnonymousFunction anonymousFunction) {
+        String anonymousName = anonymousFunction.getName();
+        /*FunctionSymbolTableItem anonymousItem;
+        try{
+            String searchKey = FunctionSymbolTableItem.START_KEY + anonymousName;
+            anonymousItem = (FunctionSymbolTableItem)SymbolTable.root.getItem(searchKey);
+        }
+        catch (ItemNotFoundException e1){
+            
+        }*/
+        
+        return new FptrType(anonymousName);
+        
         //ToDo
-        return null;
     }
 
     @Override
     public Type visit(Identifier identifier) {
         if (isMain)
             return new FptrType(identifier.getName());
-        try{
-           VariableSymbolTableItem var = (VariableSymbolTableItem) curFunction.getFunctionSymbolTable().getItem(VariableSymbolTableItem.START_KEY + identifier.getName());
-           return var.getType();
+        try{ 
+            String searchKey = VariableSymbolTableItem.START_KEY + identifier.getName();
+            VariableSymbolTableItem var = (VariableSymbolTableItem) curFunction.getFunctionSymbolTable().getItem(searchKey);
+            return var.getType();
         } catch (ItemNotFoundException e1) {
             return new FptrType(identifier.getName());
-
         }
 
     }
@@ -251,15 +247,15 @@ public class ExpressionTypeChecker extends Visitor<Type>{
     @Override
     public Type visit(FunctionCall funcCall) {
         Type type = funcCall.getInstance().accept(this);
-        ArrayList<Type> rtypes = new ArrayList<>();
-        Map<String, Type> rtypesWithKey = new HashMap<>();
+        ArrayList<Type> rTypes = new ArrayList<>();
+        Map<String, Type> rTypesWithKey = new HashMap<>();
         for (Map.Entry<Identifier,Expression> argsWithKey: funcCall.getArgsWithKey().entrySet()) {
             Type curType = argsWithKey.getValue().accept(this);
-            rtypesWithKey.put(argsWithKey.getKey().getName(), curType);
+            rTypesWithKey.put(argsWithKey.getKey().getName(), curType);
         }
         for (Expression expression : funcCall.getArgs()) {
             Type t = expression.accept(this);
-            rtypes.add(t);
+            rTypes.add(t);
         }
 
         if (!(type instanceof FptrType || type instanceof NoType)){
@@ -270,8 +266,8 @@ public class ExpressionTypeChecker extends Visitor<Type>{
         if (type instanceof FptrType) {
             boolean declareError = false;
             boolean error = false;
-            FunctionSymbolTableItem func = findFunccSymobolTableItem((FptrType) type);
-            if (func.getReturnType() instanceof VoidType && !isFunctioncallStmt) {
+            FunctionSymbolTableItem func = findFuncSymbolTableItem((FptrType) type);
+            if (func.getReturnType() instanceof VoidType && !isFunctionCallStmt) {
                 CantUseValueOfVoidFunction exception = new CantUseValueOfVoidFunction(funcCall.getLine());
                 funcCall.addError(exception);
                 error = true;
@@ -288,10 +284,10 @@ public class ExpressionTypeChecker extends Visitor<Type>{
                 declareError = true;
 
             else {
-                if(rtypes.size() != 0) {
+                if(rTypes.size() != 0) {
                     int i = 0;
-                    for (Map.Entry<String, Type> ltype : func.getArgTypes().entrySet()) {
-                        if (!sameType(ltype.getValue(), rtypes.get(i))) {
+                    for (Map.Entry<String, Type> lType : func.getArgTypes().entrySet()) {
+                        if (!sameType(lType.getValue(), rTypes.get(i))) {
                             declareError = true;
                             break;
                         }
@@ -299,10 +295,10 @@ public class ExpressionTypeChecker extends Visitor<Type>{
 
                     }
                 }
-                if(rtypesWithKey.size() != 0) {
-                    for (Map.Entry<String, Type> ltype : func.getArgTypes().entrySet()) {
-                        if (rtypesWithKey.containsKey(ltype.getKey())) {
-                            if (!sameType(rtypesWithKey.get(ltype.getKey()), ltype.getValue())) {
+                if(rTypesWithKey.size() != 0) {
+                    for (Map.Entry<String, Type> lType : func.getArgTypes().entrySet()) {
+                        if (rTypesWithKey.containsKey(lType.getKey())) {
+                            if (!sameType(rTypesWithKey.get(lType.getKey()), lType.getValue())) {
                                 declareError = true;
                                 break;
                             }
