@@ -1,6 +1,6 @@
 package main.visitor;
 
-import main.ast.nodes.Program;
+import main.ast.nodes.*;
 import main.ast.nodes.declaration.*;
 import main.ast.nodes.expression.*;
 import main.ast.nodes.expression.values.*;
@@ -150,7 +150,6 @@ public class NameAnalyser extends Visitor<Void> {
         FunctionDeclaration anonymousDec = new FunctionDeclaration();
         FunctionSymbolTableItem anonymousSymbolTableItem;
         anonymousFunction.setName("anonymous" + numOfAnonymous);
-
 
         anonymousDec.setFunctionName(new Identifier(anonymousFunction.getName()));
         anonymousDec.setArgs(anonymousFunction.getArgs());

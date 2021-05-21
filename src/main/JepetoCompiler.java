@@ -1,13 +1,10 @@
 package main;
 
 import main.ast.nodes.Program;
-import main.compileErrors.CompileError;
 import main.visitor.*;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import parsers.*;
-
-import java.util.ArrayList;
 
 public class JepetoCompiler {
 

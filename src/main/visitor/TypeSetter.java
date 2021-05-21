@@ -1,26 +1,19 @@
 package main.visitor;
 
-import main.ast.nodes.Program;
-import main.ast.nodes.declaration.FunctionDeclaration;
-import main.ast.nodes.declaration.MainDeclaration;
+import main.ast.nodes.*;
+import main.ast.nodes.declaration.*;
 import main.ast.nodes.expression.*;
-import main.ast.nodes.expression.values.ListValue;
-import main.ast.nodes.expression.values.VoidValue;
-import main.ast.nodes.expression.values.primitive.BoolValue;
-import main.ast.nodes.expression.values.primitive.IntValue;
-import main.ast.nodes.expression.values.primitive.StringValue;
+import main.ast.nodes.expression.values.*;
+import main.ast.nodes.expression.values.primitive.*;
 import main.ast.nodes.statement.*;
-import main.ast.types.NoType;
-import main.ast.types.Type;
-import main.symbolTable.SymbolTable;
-import main.symbolTable.exceptions.ItemNotFoundException;
-import main.symbolTable.items.FunctionSymbolTableItem;
-import main.symbolTable.items.VariableSymbolTableItem;
-
+import main.ast.types.*;
+import main.symbolTable.*;
+import main.symbolTable.exceptions.*;
+import main.symbolTable.items.*;
 import java.util.*;
 
 public class TypeSetter  extends Visitor<Void> {
-    private boolean fcall = false;
+    private boolean fCall = false;
     private TypeInference typeInference;
     private Set<String> visited;
     private ArrayList<ArrayList<String>> visitOrder;
@@ -40,9 +33,9 @@ public class TypeSetter  extends Visitor<Void> {
 
     private SymbolTable findFuncSymbolTable(Identifier name) {
         try {
-            FunctionSymbolTableItem fitem = (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + name.getName());
-            curFuncSymbolTableItem = fitem;
-            return fitem.getFunctionSymbolTable();
+            FunctionSymbolTableItem fItem = (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + name.getName());
+            curFuncSymbolTableItem = fItem;
+            return fItem.getFunctionSymbolTable();
         }catch (ItemNotFoundException e) {
             return null;
         }
@@ -57,13 +50,13 @@ public class TypeSetter  extends Visitor<Void> {
         for (int j=visitOrder.size() -1; j>=0 ; j--) {
             for (int i = visitOrder.get(j).size()-1; i >= 0; i--) {
                 try {
-                    FunctionSymbolTableItem fitem = (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + visitOrder.get(j).get(i));
-                    if (fitem.getReturnType() == null) {
+                    FunctionSymbolTableItem fItem = (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + visitOrder.get(j).get(i));
+                    if (fItem.getReturnType() == null) {
                         visited.remove(visitOrder.get(j).get(i));
-                        fitem.getFuncDeclaration().accept(this);
+                        fItem.getFuncDeclaration().accept(this);
                     }
-                    if (fitem.getReturnType() == null)
-                        fitem.setReturnType(new NoType());
+                    if (fItem.getReturnType() == null)
+                        fItem.setReturnType(new NoType());
                 } catch (ItemNotFoundException e) {
 
                 }
@@ -73,12 +66,12 @@ public class TypeSetter  extends Visitor<Void> {
             if (! visited.contains(funcDec.getFunctionName().getName()))
                 continue;
             try {
-                FunctionSymbolTableItem fitem = (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + funcDec.getFunctionName().getName());
-                FunctionDeclaration fdec = fitem.getFuncDeclaration();
+                FunctionSymbolTableItem fItem = (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + funcDec.getFunctionName().getName());
+                FunctionDeclaration fDec = fItem.getFuncDeclaration();
                 int i = 0;
-                System.out.println(fdec.getFunctionName().getName());
-                System.out.println(fitem.getArgTypes().values());
-                System.out.println(fitem.getReturnType());
+                System.out.println(fDec.getFunctionName().getName());
+                System.out.println(fItem.getArgTypes().values());
+                System.out.println(fItem.getReturnType());
             }catch (ItemNotFoundException e) {
 
             }

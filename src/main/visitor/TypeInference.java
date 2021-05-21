@@ -14,9 +14,9 @@ import java.util.*;
 
 public class TypeInference extends Visitor<Type> {
     private SymbolTable functionSymbolTable;
-    private Set<String> visited;
-    private TypeSetter typeSetter;
-    private int numOfAnonymous = 0;
+    private final Set<String> visited;
+    private final TypeSetter typeSetter;
+    private final int numOfAnonymous = 0;
 
     public TypeInference(TypeSetter typeSetter) {
         this.typeSetter = typeSetter;

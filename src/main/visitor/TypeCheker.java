@@ -1,28 +1,22 @@
 package main.visitor;
 
-import main.ast.nodes.Program;
-import main.ast.nodes.declaration.FunctionDeclaration;
-import main.ast.nodes.declaration.MainDeclaration;
+import main.ast.nodes.*;
+import main.ast.nodes.declaration.*;
 import main.ast.nodes.statement.*;
-import main.ast.types.NoType;
-import main.ast.types.Type;
-import main.ast.types.VoidType;
-import main.ast.types.functionPointer.FptrType;
-import main.ast.types.list.ListType;
-import main.ast.types.single.BoolType;
-import main.ast.types.single.IntType;
-import main.ast.types.single.StringType;
+import main.ast.types.*;
+import main.ast.types.functionPointer.*;
+import main.ast.types.list.*;
+import main.ast.types.single.*;
 import main.compileErrors.typeErrors.*;
-import main.symbolTable.SymbolTable;
-import main.symbolTable.exceptions.ItemNotFoundException;
-import main.symbolTable.items.FunctionSymbolTableItem;
-
+import main.symbolTable.*;
+import main.symbolTable.exceptions.*;
+import main.symbolTable.items.*;
 import java.util.*;
 
 public class TypeCheker extends Visitor<Void> {
-    private ExpressionTypeChecker expressionTypeChecker;
+    private final ExpressionTypeChecker expressionTypeChecker;
     private FunctionSymbolTableItem curFunction;
-    private Set<String> visited;
+    private final Set<String> visited;
 
     public TypeCheker(Set<String> visited) {
         expressionTypeChecker = new ExpressionTypeChecker();

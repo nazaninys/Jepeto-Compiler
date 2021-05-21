@@ -2,7 +2,6 @@ package main.ast.nodes.expression;
 
 import main.ast.nodes.statement.Statement;
 import main.visitor.IVisitor;
-
 import java.util.ArrayList;
 
 public class AnonymousFunction extends Expression {

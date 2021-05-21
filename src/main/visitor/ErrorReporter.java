@@ -1,17 +1,13 @@
 package main.visitor;
 
-import main.ast.nodes.Node;
-import main.ast.nodes.Program;
+import main.ast.nodes.*;
 import main.ast.nodes.declaration.*;
 import main.ast.nodes.expression.*;
 import main.ast.nodes.expression.values.*;
 import main.ast.nodes.expression.values.primitive.*;
 import main.ast.nodes.statement.*;
 import main.compileErrors.CompileError;
-
-
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.*;
 
 public class ErrorReporter extends Visitor<Integer> {
 
@@ -30,7 +26,6 @@ public class ErrorReporter extends Visitor<Integer> {
         for(FunctionDeclaration funcDeclaration : program.getFunctions()) {
             numOfErrors += funcDeclaration.accept(this);
         }
-
         return numOfErrors;
     }
 
@@ -42,10 +37,7 @@ public class ErrorReporter extends Visitor<Integer> {
         for(Identifier arg : funcDeclaration.getArgs()) {
             numOfErrors += arg.accept(this);
         }
-
-
         numOfErrors += funcDeclaration.getBody().accept(this);
-
         return numOfErrors;
     }
 
@@ -54,11 +46,7 @@ public class ErrorReporter extends Visitor<Integer> {
         int numOfErrors = printErrors(mainDeclaration);
         numOfErrors += mainDeclaration.getBody().accept(this);
         return numOfErrors;
-
     }
-
-
-
 
     @Override
     public Integer visit(BlockStmt blockStmt) {
@@ -100,8 +88,6 @@ public class ErrorReporter extends Visitor<Integer> {
         numOfErrors += returnStmt.getReturnedExpr().accept(this);
         return numOfErrors;
     }
-
-
 
     @Override
     public Integer visit(BinaryExpression binaryExpression) {
@@ -157,7 +143,6 @@ public class ErrorReporter extends Visitor<Integer> {
         for (Map.Entry<Identifier,Expression> argsWithKey: funcCall.getArgsWithKey().entrySet()){
             numOfErrors += argsWithKey.getKey().accept(this);
             numOfErrors += argsWithKey.getValue().accept(this);
-
         }
         return numOfErrors;
     }

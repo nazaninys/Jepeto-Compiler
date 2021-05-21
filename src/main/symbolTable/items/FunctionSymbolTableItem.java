@@ -3,7 +3,6 @@ package main.symbolTable.items;
 import main.ast.nodes.declaration.FunctionDeclaration;
 import main.ast.types.Type;
 import main.symbolTable.SymbolTable;
-
 import java.util.*;
 
 public class FunctionSymbolTableItem extends SymbolTableItem {
@@ -22,7 +21,6 @@ public class FunctionSymbolTableItem extends SymbolTableItem {
     public SymbolTable getFunctionSymbolTable() {
         return FunctionSymbolTable;
     }
-
     public void setFunctionSymbolTable(SymbolTable functionSymbolTable) {
         FunctionSymbolTable = functionSymbolTable;
     }
@@ -30,7 +28,6 @@ public class FunctionSymbolTableItem extends SymbolTableItem {
     public FunctionDeclaration getFuncDeclaration() {
         return funcDeclaration;
     }
-
     public void setFuncDeclaration(FunctionDeclaration funcDeclaration) {
         this.funcDeclaration = funcDeclaration;
     }
@@ -46,7 +43,6 @@ public class FunctionSymbolTableItem extends SymbolTableItem {
     public Type getReturnType() {
         return returnType;
     }
-
     public void setReturnType(Type returnType) {
         this.returnType = returnType;
     }
