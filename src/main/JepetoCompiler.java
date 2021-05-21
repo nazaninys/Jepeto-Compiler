@@ -1,7 +1,7 @@
 package main;
 
 import main.ast.nodes.Program;
-import main.compileError.CompileError;
+import main.compileErrors.CompileError;
 import main.visitor.*;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;

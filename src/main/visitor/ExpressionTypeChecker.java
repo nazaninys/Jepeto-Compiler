@@ -8,7 +8,7 @@ import main.ast.types.*;
 import main.ast.types.functionPointer.*;
 import main.ast.types.list.*;
 import main.ast.types.single.*;
-import main.compileError.typeErrors.*;
+import main.compileErrors.typeErrors.*;
 import main.symbolTable.*;
 import main.symbolTable.exceptions.*;
 import main.symbolTable.items.*;

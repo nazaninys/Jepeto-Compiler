@@ -5,7 +5,7 @@ import main.ast.nodes.declaration.*;
 import main.ast.nodes.expression.*;
 import main.ast.nodes.expression.values.*;
 import main.ast.nodes.statement.*;
-import main.compileError.nameError.*;
+import main.compileErrors.nameErrors.*;
 import main.symbolTable.*;
 import main.symbolTable.exceptions.*;
 import main.symbolTable.items.*;

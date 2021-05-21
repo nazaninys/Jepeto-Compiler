@@ -12,7 +12,7 @@ import main.ast.types.list.ListType;
 import main.ast.types.single.BoolType;
 import main.ast.types.single.IntType;
 import main.ast.types.single.StringType;
-import main.compileError.typeErrors.*;
+import main.compileErrors.typeErrors.*;
 import main.symbolTable.SymbolTable;
 import main.symbolTable.exceptions.ItemNotFoundException;
 import main.symbolTable.items.FunctionSymbolTableItem;
@@ -149,7 +149,7 @@ public class TypeCheker extends Visitor<Void> {
         Type returnType = returnStmt.getReturnedExpr().accept(expressionTypeChecker);
 
         if(assignmentHasError(curFunction.getReturnType(), returnType)){
-            ReturnValueNotMatchFunctionReturnType exception = new ReturnValueNotMatchFunctionReturnType(returnStmt);
+            ReturnValueNotMatchFunctionReturnType exception = new ReturnValueNotMatchFunctionReturnType(returnStmt.getLine());
             returnStmt.addError(exception);
         }
         return null;
