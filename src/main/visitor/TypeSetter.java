@@ -27,8 +27,6 @@ public class TypeSetter  extends Visitor<Void> {
     public TypeSetter() {
         typeInference = new TypeInference(this);
         visited = new HashSet<>();
-        visitOrder = new ArrayList<>();
-        temp = new ArrayList<>();
     }
 
     public Set<String> getVisited() {
@@ -74,8 +72,6 @@ public class TypeSetter  extends Visitor<Void> {
         if(visited.contains(funcDeclaration.getFunctionName().getName()))
             return null;
         visited.add(funcDeclaration.getFunctionName().getName());
-        if(add)
-            temp.add(funcDeclaration.getFunctionName().getName());
         typeInference.addVisited(funcDeclaration.getFunctionName().getName());
         FunctionSymbolTableItem temp = curFuncSymbolTableItem;
         typeInference.setFunctionSymbolTable(findFuncSymbolTable(funcDeclaration.getFunctionName()));

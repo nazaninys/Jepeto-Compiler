@@ -67,9 +67,7 @@ public class TypeCheker extends Visitor<Void> {
 
     @Override
     public Void visit(MainDeclaration mainDeclaration) {
-        expressionTypeChecker.setMain(true);
         mainDeclaration.getBody().accept(this);
-        expressionTypeChecker.setMain(false);
         return null;
     }
 
