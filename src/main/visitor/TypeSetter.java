@@ -23,10 +23,7 @@ public class TypeSetter  extends Visitor<Void> {
     private boolean fcall = false;
     private TypeInference typeInference;
     private Set<String> visited;
-    private ArrayList<ArrayList<String>> visitOrder;
-    private ArrayList<String> temp;
     private FunctionSymbolTableItem curFuncSymbolTableItem;
-    private boolean add = true;
     public TypeSetter() {
         typeInference = new TypeInference(this);
         visited = new HashSet<>();
@@ -52,23 +49,8 @@ public class TypeSetter  extends Visitor<Void> {
     @Override
     public Void visit(Program program) {
         program.getMain().accept(this);
-        visitOrder.add(0,temp);
-        add = false;
-        for (int j=visitOrder.size() -1; j>=0 ; j--) {
-            for (int i = visitOrder.get(j).size()-1; i >= 0; i--) {
-                try {
-                    FunctionSymbolTableItem fitem = (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + visitOrder.get(j).get(i));
-                    if (fitem.getReturnType() == null || fitem.getReturnType() instanceof NoType) {
-                        visited.remove(visitOrder.get(j).get(i));
-                        fitem.getFuncDeclaration().accept(this);
-                    }
-                    if (fitem.getReturnType() == null)
-                        fitem.setReturnType(new NoType());
-                } catch (ItemNotFoundException e) {
-
-                }
-            }
-        }
+        visited.clear();
+        program.getMain().accept(this);
         for (FunctionDeclaration funcDec : program.getFunctions()) {
             if (! visited.contains(funcDec.getFunctionName().getName()))
                 continue;
@@ -89,13 +71,8 @@ public class TypeSetter  extends Visitor<Void> {
 
     @Override
     public Void visit(FunctionDeclaration funcDeclaration) {
-        if(visited.contains(funcDeclaration.getFunctionName().getName())) {
-            if (add) {
-                visitOrder.add(0, (ArrayList<String>) temp.clone());
-                temp.clear();
-            }
+        if(visited.contains(funcDeclaration.getFunctionName().getName()))
             return null;
-        }
         visited.add(funcDeclaration.getFunctionName().getName());
         if(add)
             temp.add(funcDeclaration.getFunctionName().getName());
