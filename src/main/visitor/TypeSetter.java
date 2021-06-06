@@ -55,7 +55,8 @@ public class TypeSetter  extends Visitor<Void> {
             try {
                 FunctionSymbolTableItem fitem = (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + funcDec.getFunctionName().getName());
                 FunctionDeclaration fdec = fitem.getFuncDeclaration();
-                int i = 0;
+                if (fitem.getReturnType() == null)
+                    fitem.setReturnType(new NoType());
                 System.out.println(fdec.getFunctionName().getName());
                 System.out.println(fitem.getArgTypes().values());
                 System.out.println(fitem.getReturnType());

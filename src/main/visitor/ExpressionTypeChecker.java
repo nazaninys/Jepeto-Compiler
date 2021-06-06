@@ -127,8 +127,12 @@ public class ExpressionTypeChecker extends Visitor<Type>{
                 binaryExpression.addError(exception);
                 return new NoType();
             }
-            else
-                return new BoolType();
+            else {
+                if(tl instanceof NoType || tr instanceof NoType)
+                    return new NoType();
+                else
+                    return new BoolType();
+            }
         }
 
         else if(operator.equals(BinaryOperator.gt) || operator.equals(BinaryOperator.lt)){

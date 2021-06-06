@@ -160,8 +160,12 @@ public class TypeInference extends Visitor<Type> {
                 return new NoType();
             if(!sameType(tl,tr))
                 return new NoType();
-            else
-                return new BoolType();
+            else {
+                if(tl instanceof NoType || tr instanceof NoType)
+                    return new NoType();
+                else
+                    return new BoolType();
+            }
         }
 
         else if(operator.equals(BinaryOperator.gt) || operator.equals(BinaryOperator.lt)){
