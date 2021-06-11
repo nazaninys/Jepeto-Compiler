@@ -37,6 +37,8 @@ public class TypeCheker extends Visitor<Void> {
         return curFunction;
     }
 
+    public ExpressionTypeChecker getExpressionTypeChecker(){return expressionTypeChecker;}
+
     private FunctionSymbolTableItem findFunccSymobolTableItem(FptrType fptr) {
         try{
             FunctionSymbolTableItem func = (FunctionSymbolTableItem) SymbolTable.root.getItem(FunctionSymbolTableItem.START_KEY + fptr.getFunctionName());

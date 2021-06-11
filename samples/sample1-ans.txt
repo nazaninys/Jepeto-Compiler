@@ -6,9 +6,10 @@ Generated: List.class
 Generated: Main.class
 
 ---------------------------Output---------------------------
--310
-str
--2
-13
+4
 1
-PLC_1400
+3
+[[1,2],[3,4],[5,6]]
+Hello
+0
+120

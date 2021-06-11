@@ -3,7 +3,7 @@
     <output_file path="$PROJECT_DIR$/samples/sample2-ans.txt" is_save="true" />
     <option name="MAIN_CLASS_NAME" value="main.Jepeto" />
     <module name="Jepeto-Phase2" />
-    <option name="PROGRAM_PARAMETERS" value="samples/sample2.jp" />
+    <option name="PROGRAM_PARAMETERS" value="samples/sample1.jp" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

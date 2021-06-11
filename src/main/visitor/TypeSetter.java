@@ -57,9 +57,9 @@ public class TypeSetter  extends Visitor<Void> {
                 FunctionDeclaration fdec = fitem.getFuncDeclaration();
                 if (fitem.getReturnType() == null)
                     fitem.setReturnType(new NoType());
-                System.out.println(fdec.getFunctionName().getName());
-                System.out.println(fitem.getArgTypes().values());
-                System.out.println(fitem.getReturnType());
+//                System.out.println(fdec.getFunctionName().getName());
+//                System.out.println(fitem.getArgTypes().values());
+//                System.out.println(fitem.getReturnType());
             }catch (ItemNotFoundException e) {
 
             }

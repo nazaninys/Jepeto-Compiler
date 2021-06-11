@@ -28,6 +28,7 @@ public class TypeInference extends Visitor<Type> {
     public TypeInference(TypeSetter typeSetter) {
         this.typeSetter = typeSetter;
         visited = new HashSet<>();
+        isFunctioncallStmt = false;
     }
 
     public void setFunctionSymbolTable(SymbolTable functionSymbolTable) {
@@ -281,6 +282,7 @@ public class TypeInference extends Visitor<Type> {
 
     @Override
     public Type visit(FunctionCall funcCall) {
+        boolean flag = isFunctioncallStmt;
         Type instanceType = funcCall.getInstance().accept(this);
         ArrayList<Type> rtypes = new ArrayList<>();
         Map<String, Type> rtypesWithKey = new HashMap<>();
@@ -302,7 +304,7 @@ public class TypeInference extends Visitor<Type> {
                 setArgumentsTypeWithKey(fItem, rtypesWithKey);
             else
                 setArgumentsType(fItem, rtypes);
-
+            isFunctioncallStmt = false;
             fItem.getFuncDeclaration().accept(typeSetter);
         }
 
@@ -314,10 +316,10 @@ public class TypeInference extends Visitor<Type> {
             boolean declareError = false;
             boolean error = false;
             FunctionSymbolTableItem func = findFunccSymobolTableItem((FptrType) instanceType);
+            isFunctioncallStmt = false;
             func.getFuncDeclaration().accept(typeSetter);
-            if (func.getReturnType() instanceof VoidType && !isFunctioncallStmt)
+            if (func.getReturnType() instanceof VoidType && !flag)
                 error = true;
-
             if(funcCall.getArgsWithKey().size() != 0) {
                 if(funcCall.getArgsWithKey().size() != func.getArgTypes().size()) {
                     error = true;

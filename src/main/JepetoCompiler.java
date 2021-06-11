@@ -7,6 +7,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import parsers.*;
 
+import java.io.*;
 import java.util.ArrayList;
 
 public class JepetoCompiler {
@@ -33,6 +34,37 @@ public class JepetoCompiler {
             System.exit(1);
         System.out.println("Compilation successful");
 
+        CodeGenerator codeGenerator = new CodeGenerator(typeCheker.getExpressionTypeChecker());
+        program.accept(codeGenerator);
+
+        runJasminFiles();
+    }
+
+    private void runJasminFiles() {
+        try {
+            System.out.println("\n-------------------Generating Class Files-------------------");
+            File dir = new File("./output");
+            Process process = Runtime.getRuntime().exec("java -jar jasmin.jar *.j", null, dir);
+            printResults(process.getInputStream());
+            printResults(process.getErrorStream());
+            System.out.println("\n---------------------------Output---------------------------");
+            process = Runtime.getRuntime().exec("java Main", null, dir);
+            printResults(process.getInputStream());
+            printResults(process.getErrorStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void printResults(InputStream stream) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+        String line;
+        try {
+            while ((line = reader.readLine()) != null)
+                System.out.println(line);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

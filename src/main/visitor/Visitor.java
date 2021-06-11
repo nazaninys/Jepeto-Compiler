@@ -122,6 +122,4 @@ public class Visitor<T> implements IVisitor<T> {
         return null;
     }
 
-
-
 }

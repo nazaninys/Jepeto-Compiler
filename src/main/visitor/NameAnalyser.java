@@ -241,9 +241,9 @@ public class NameAnalyser extends Visitor<Void> {
             for (Identifier id : fDec.getArgs())
                 arguments.add(id.getName());
         }
-        for (Map.Entry<Identifier,Expression> argsWithKey: funcCall.getArgsWithKey().entrySet()){
-            argsWithKey.getValue().accept(this);
-            if (funcDeclared) {
+        if (funcDeclared) {
+            for (Map.Entry<Identifier,Expression> argsWithKey: funcCall.getArgsWithKey().entrySet()){
+                argsWithKey.getValue().accept(this);
                 if ( ! arguments.contains(argsWithKey.getKey().getName())) {
                     ArgumentNotDeclared exception = new ArgumentNotDeclared(argsWithKey.getKey().getLine(),
                             argsWithKey.getKey().getName(),
