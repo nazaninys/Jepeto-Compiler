@@ -1,4 +1,4 @@
-package main.visitor;
+package main.visitor.name;
 
 import main.ast.nodes.Program;
 import main.ast.nodes.declaration.FunctionDeclaration;
@@ -10,6 +10,7 @@ import main.ast.nodes.expression.values.primitive.BoolValue;
 import main.ast.nodes.expression.values.primitive.IntValue;
 import main.ast.nodes.expression.values.primitive.StringValue;
 import main.ast.nodes.statement.*;
+import main.visitor.Visitor;
 
 import java.util.*;
 

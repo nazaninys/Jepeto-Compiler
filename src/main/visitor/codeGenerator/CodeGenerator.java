@@ -1,4 +1,4 @@
-package main.visitor;
+package main.visitor.codeGenerator;
 
 import main.ast.nodes.*;
 import main.ast.nodes.declaration.*;
@@ -13,13 +13,15 @@ import main.ast.types.single.*;
 import main.symbolTable.SymbolTable;
 import main.symbolTable.exceptions.ItemNotFoundException;
 import main.symbolTable.items.FunctionSymbolTableItem;
+import main.visitor.Visitor;
+import main.visitor.type.ExpressionTypeChecker;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class CodeGenerator extends Visitor<String>{
+public class CodeGenerator extends Visitor<String> {
     private final String outputPath;
     private FileWriter mainFile;
     private final ExpressionTypeChecker expressionTypeChecker;

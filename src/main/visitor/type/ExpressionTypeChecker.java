@@ -1,4 +1,4 @@
-package main.visitor;
+package main.visitor.type;
 
 import main.ast.nodes.expression.*;
 import main.ast.nodes.expression.operators.BinaryOperator;
@@ -14,20 +14,18 @@ import main.ast.types.VoidType;
 import main.ast.types.functionPointer.FptrType;
 import main.ast.types.list.ListType;
 import main.ast.types.single.BoolType;
-import main.ast.types.single.ClassType;
 import main.ast.types.single.IntType;
 import main.ast.types.single.StringType;
-import main.compileError.nameError.FunctionNotDeclared;
-import main.compileError.nameError.VariableNotDeclared;
 import main.compileError.typeErrors.*;
 import main.symbolTable.SymbolTable;
 import main.symbolTable.exceptions.ItemNotFoundException;
 import main.symbolTable.items.FunctionSymbolTableItem;
 import main.symbolTable.items.VariableSymbolTableItem;
+import main.visitor.Visitor;
 
 import java.util.*;
 
-public class ExpressionTypeChecker extends Visitor<Type>{
+public class ExpressionTypeChecker extends Visitor<Type> {
     private TypeCheker typeCheker;
     private FunctionSymbolTableItem curFunction;
     private boolean isFunctioncallStmt;

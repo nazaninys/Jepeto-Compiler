@@ -1,14 +1,16 @@
 package main;
 
 import main.ast.nodes.Program;
-import main.compileError.CompileError;
 import main.visitor.*;
+import main.visitor.codeGenerator.CodeGenerator;
+import main.visitor.name.NameAnalyser;
+import main.visitor.type.TypeCheker;
+import main.visitor.type.TypeSetter;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import parsers.*;
 
 import java.io.*;
-import java.util.ArrayList;
 
 public class JepetoCompiler {
 

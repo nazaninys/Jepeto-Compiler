@@ -1,4 +1,4 @@
-package main.visitor;
+package main.visitor.type;
 
 import main.ast.nodes.declaration.*;
 import main.ast.nodes.expression.*;
@@ -13,6 +13,8 @@ import main.ast.types.single.*;
 import main.symbolTable.SymbolTable;
 import main.symbolTable.exceptions.ItemNotFoundException;
 import main.symbolTable.items.*;
+import main.visitor.Visitor;
+
 import java.util.*;
 
 public class TypeInference extends Visitor<Type> {

@@ -1,21 +1,16 @@
-package main.visitor;
+package main.visitor.type;
 
 import main.ast.nodes.Program;
 import main.ast.nodes.declaration.FunctionDeclaration;
 import main.ast.nodes.declaration.MainDeclaration;
 import main.ast.nodes.expression.*;
-import main.ast.nodes.expression.values.ListValue;
-import main.ast.nodes.expression.values.VoidValue;
-import main.ast.nodes.expression.values.primitive.BoolValue;
-import main.ast.nodes.expression.values.primitive.IntValue;
-import main.ast.nodes.expression.values.primitive.StringValue;
 import main.ast.nodes.statement.*;
 import main.ast.types.NoType;
 import main.ast.types.Type;
 import main.symbolTable.SymbolTable;
 import main.symbolTable.exceptions.ItemNotFoundException;
 import main.symbolTable.items.FunctionSymbolTableItem;
-import main.symbolTable.items.VariableSymbolTableItem;
+import main.visitor.Visitor;
 
 import java.util.*;
 

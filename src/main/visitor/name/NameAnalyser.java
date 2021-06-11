@@ -1,4 +1,4 @@
-package main.visitor;
+package main.visitor.name;
 
 import main.ast.nodes.Program;
 import main.ast.nodes.declaration.*;
@@ -9,6 +9,8 @@ import main.compileError.nameError.*;
 import main.symbolTable.*;
 import main.symbolTable.exceptions.*;
 import main.symbolTable.items.*;
+import main.visitor.Visitor;
+
 import java.util.*;
 
 public class NameAnalyser extends Visitor<Void> {

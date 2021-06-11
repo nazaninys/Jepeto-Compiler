@@ -4,7 +4,6 @@ import main.symbolTable.exceptions.ItemAlreadyExistsException;
 import main.symbolTable.exceptions.ItemNotFoundException;
 import main.symbolTable.items.SymbolTableItem;
 import main.symbolTable.utils.Stack;
-import main.visitor.NameAnalyser;
 
 import java.util.*;
 
