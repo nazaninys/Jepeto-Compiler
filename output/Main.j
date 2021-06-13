@@ -7,3 +7,36 @@
 		invokespecial Main/<init>()V
 		return
 .end method
+.method public <init>()V
+.limit stack 128
+.limit locals 128
+		aload 0
+		invokespecial java/lang/Object/<init>()V
+		getstatic java/lang/System/out Ljava/io/PrintStream;
+		new Fptr
+		dup
+		aload 0
+		ldc "f"
+		invokespecial Fptr/<init>(Ljava/lang/Object;Ljava/lang/String;)V
+		new java/util/ArrayList
+		dup
+		invokespecial java/util/ArrayList/<init>()V
+		astore 1
+		aload 1
+		ldc 5
+		invokestatic java/lang/Integer/valueOf(I)Ljava/lang/Integer;
+		invokevirtual java/util/ArrayList/add(Ljava/lang/Object;)Z
+		pop
+		aload 1
+		invokevirtual Fptr/invoke(Ljava/util/ArrayList;)Ljava/lang/Object;
+		checkcast java/lang/Integer
+		invokevirtual java/lang/Integer/intValue()I
+		invokevirtual java/io/PrintStream/print(I)V
+		return
+.end method
+.method public f(Ljava/lang/Integer;)Ljava/lang/Integer;
+.limit stack 128
+.limit locals 128
+		aload 1
+		areturn
+.end method

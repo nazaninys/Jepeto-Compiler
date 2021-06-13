@@ -20,16 +20,20 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class CodeGenerator extends Visitor<String> {
     private final String outputPath;
     private FileWriter mainFile;
     private final ExpressionTypeChecker expressionTypeChecker;
+    private Set<String> visited;
     private int numOfUsedTemp = 0;
+    private int numOfUsedLabel = 0;
     private FunctionDeclaration curFuncDec;
 
-    public CodeGenerator(ExpressionTypeChecker expressionTypeChecker) {
+    public CodeGenerator(ExpressionTypeChecker expressionTypeChecker, Set<String> visited) {
         this.expressionTypeChecker = expressionTypeChecker;
+        this.visited = visited;
         outputPath = "./output/";
         prepareOutputFolder();
     }
@@ -77,17 +81,6 @@ public class CodeGenerator extends Visitor<String> {
         }
     }
 
-
-    private void addStaticMainMethod() {
-        addCommand(".method public static main([Ljava/lang/String;)V");
-        addCommand(".limit stack 128");
-        addCommand(".limit locals 128");
-        addCommand("new Main");
-        addCommand("invokespecial Main/<init>()V");
-        addCommand("return");
-        addCommand(".end method");
-    }
-
     private void addCommand(String command) {
         try {
             command = String.join("\n\t\t", command.split("\n"));
@@ -101,6 +94,33 @@ public class CodeGenerator extends Visitor<String> {
         } catch (IOException e) {//never reached
 
         }
+    }
+
+    private void addStaticMainMethod() {
+        addCommand(".method public static main([Ljava/lang/String;)V");
+        addCommand(".limit stack 128");
+        addCommand(".limit locals 128");
+        addCommand("new Main");
+        addCommand("invokespecial Main/<init>()V");
+        addCommand("return");
+        addCommand(".end method");
+    }
+
+    private int slotOf(String identifier) {
+        int count = 1;
+        if (curFuncDec != null){
+            for(Identifier arg : curFuncDec.getArgs()){
+                if(arg.getName().equals(identifier))
+                    return count;
+                count++;
+            }
+        }
+        if (identifier.equals("")){
+            int temp = numOfUsedTemp;
+            numOfUsedTemp++;
+            return count + temp;
+        }
+        return 0;
     }
 
     private String makeTypeSignature(Type t) {
@@ -117,19 +137,29 @@ public class CodeGenerator extends Visitor<String> {
         return null;
     }
 
-    private int slotOf(String identifier) {
-        int count = 1;
-        for(Identifier arg : curFuncDec.getArgs()){
-            if(arg.getName().equals(identifier))
-                return count;
-            count++;
-        }
-        if (identifier.equals("")){
-            int temp = numOfUsedTemp;
-            numOfUsedTemp++;
-            return count + temp;
-        }
-        return 0;
+    private String getFreshLabel(){
+        String label = "Label_";
+        label += numOfUsedLabel;
+        numOfUsedLabel++;
+        return label;
+    }
+
+    private String primitiveToNonPrimitive(Type type){
+        String commands = "";
+        if(type instanceof IntType)
+            commands += "invokestatic java/lang/Integer/valueOf(I)Ljava/lang/Integer;\n";
+        if(type instanceof BoolType)
+            commands += "invokestatic java/lang/Boolean/valueOf(Z)Ljava/lang/Boolean;\n";
+        return commands;
+    }
+
+    private String nonPrimitiveToPrimitive(Type type){
+        String commands = "";
+        if(type instanceof IntType)
+            commands += "invokevirtual java/lang/Integer/intValue()I\n";
+        if(type instanceof BoolType)
+            commands += "invokevirtual java/lang/Boolean/booleanValue()Z\n";
+        return commands;
     }
 
     @Override
@@ -139,12 +169,15 @@ public class CodeGenerator extends Visitor<String> {
 
         addStaticMainMethod();
 
-//        program.getMain().accept(this);
-//
-//        for(FunctionDeclaration funcDec : program.getFunctions()){
-//            curFuncDec = funcDec;
-//            funcDec.accept(this);
-//        }
+        program.getMain().accept(this);
+
+        for(FunctionDeclaration funcDec : program.getFunctions()){
+            if (! visited.contains(funcDec.getFunctionName().getName()))
+                continue;
+            curFuncDec = funcDec;
+            funcDec.accept(this);
+            numOfUsedTemp = 0;
+        }
         return null;
     }
 
@@ -171,11 +204,12 @@ public class CodeGenerator extends Visitor<String> {
             header += ")L"  + makeTypeSignature(returnType) + ";";
 
         addCommand(header);
+        addCommand(".limit stack 128");
+        addCommand(".limit locals 128");
 
         funcDeclaration.getBody().accept(this);
         addCommand(".end method");
 
-        numOfUsedTemp = 0;
         return null;
     }
 
@@ -205,13 +239,25 @@ public class CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(ConditionalStmt conditionalStmt) {
-        //todo
+        String labelFalse = getFreshLabel();
+        String labelAfter = getFreshLabel();
+        addCommand(conditionalStmt.getCondition().accept(this));
+        addCommand("ifeq " + labelFalse);
+        conditionalStmt.getThenBody().accept(this);
+        addCommand("goto " + labelAfter);
+        addCommand(labelFalse + ":");
+        if (conditionalStmt.getElseBody() != null)
+            conditionalStmt.getElseBody().accept(this);
+        addCommand(labelAfter + ":");
         return null;
     }
 
     @Override
     public String visit(FunctionCallStmt funcCallStmt) {
-        //todo
+        expressionTypeChecker.setFunctioncallStmt(true);
+        addCommand(funcCallStmt.getFunctionCall().accept(this));
+        addCommand("pop");
+        expressionTypeChecker.setFunctioncallStmt(false);
         return null;
     }
 
@@ -220,6 +266,7 @@ public class CodeGenerator extends Visitor<String> {
         addCommand("getstatic java/lang/System/out Ljava/io/PrintStream;");
         Type argType = print.getArg().accept(expressionTypeChecker);
         addCommand(print.getArg().accept(this));
+        addCommand(nonPrimitiveToPrimitive(argType));
         if (argType instanceof IntType)
             addCommand("invokevirtual java/io/PrintStream/print(I)V");
         if (argType instanceof BoolType)
@@ -233,9 +280,16 @@ public class CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(ReturnStmt returnStmt) {
-        //todo
+        Type type = returnStmt.getReturnedExpr().accept(expressionTypeChecker);
+        if(type instanceof VoidType) {
+            addCommand("return");
+        }
+        else {
+            addCommand( returnStmt.getReturnedExpr().accept(this) );
+            addCommand("areturn");
+        }
         return null;
-    }
+    } //done
 
     @Override
     public String visit(BinaryExpression binaryExpression) {
@@ -257,8 +311,21 @@ public class CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(Identifier identifier) {
-        //todo
-        return null;
+        String commands = "";
+        String searchKey = FunctionSymbolTableItem.START_KEY + identifier.getName();
+        int slotOfArgument;
+        try {
+            SymbolTable.root.getItem(searchKey);
+            commands += "new Fptr\n";
+            commands += "dup\n";
+            commands += "aload 0\n";
+            commands += "ldc \"" + identifier.getName() + "\"\n";
+            commands += "invokespecial Fptr/<init>(Ljava/lang/Object;Ljava/lang/String;)V\n";
+        }catch (ItemNotFoundException e){
+            slotOfArgument = slotOf(identifier.getName());
+            commands += "aload " + slotOfArgument + "\n";
+        }
+        return  commands;
     }
 
     @Override
@@ -275,8 +342,52 @@ public class CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(FunctionCall funcCall) {
-        //todo
-        return null;
+        String commands = "";
+        int tempIndex = slotOf("");
+
+        FptrType fptrType = (FptrType) funcCall.getInstance().accept(expressionTypeChecker);
+        String searchKey = FunctionSymbolTableItem.START_KEY + fptrType.getFunctionName();
+        Type retType = new VoidType(); // just for initialize
+
+        try {
+            FunctionSymbolTableItem functionSymbolTableItem = (FunctionSymbolTableItem)SymbolTable.root.getItem(searchKey);
+            retType = functionSymbolTableItem.getReturnType();
+        }catch (ItemNotFoundException e){ //unreachable
+        }
+
+        commands += funcCall.getInstance().accept(this);
+        commands += "new java/util/ArrayList\n";
+        commands += "dup\n";
+        commands += "invokespecial java/util/ArrayList/<init>()V\n";
+        commands += "astore " + tempIndex + "\n";
+
+
+        for(Expression arg : funcCall.getArgs()){
+            commands += "aload " + tempIndex + "\n";
+
+            Type argType = arg.accept(expressionTypeChecker);
+
+            if(argType instanceof ListType) {
+                commands += "new List\n";
+                commands += "dup\n";
+            }
+
+            commands += arg.accept(this);
+
+            if(argType instanceof ListType) {
+                commands += "invokespecial List/<init>(LList;)V\n";
+            }
+            commands += "invokevirtual java/util/ArrayList/add(Ljava/lang/Object;)Z\n";
+            commands += "pop\n";
+        }
+
+        commands += "aload " + tempIndex + "\n";
+        commands += "invokevirtual Fptr/invoke(Ljava/util/ArrayList;)Ljava/lang/Object;\n";
+
+        if(!(retType instanceof VoidType))
+            commands += "checkcast " + makeTypeSignature(retType) + "\n";
+
+        return commands;
     }
 
     @Override
@@ -312,6 +423,7 @@ public class CodeGenerator extends Visitor<String> {
     public String visit(IntValue intValue) {
         String commands = "";
         commands += "ldc " + intValue.getConstant() +"\n";
+        commands += primitiveToNonPrimitive(new IntType());
         return commands;
     } //done
 
@@ -322,6 +434,7 @@ public class CodeGenerator extends Visitor<String> {
             commands += "ldc " + "1\n";
         else
             commands += "ldc " + "0\n";
+        commands += primitiveToNonPrimitive(new BoolType());
         return commands;
     } //done
 
