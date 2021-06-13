@@ -6,4 +6,5 @@ Generated: List.class
 Generated: Main.class
 
 ---------------------------Output---------------------------
-5
+bye
+hi

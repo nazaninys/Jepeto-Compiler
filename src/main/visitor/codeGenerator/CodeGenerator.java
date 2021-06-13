@@ -242,6 +242,7 @@ public class CodeGenerator extends Visitor<String> {
         String labelFalse = getFreshLabel();
         String labelAfter = getFreshLabel();
         addCommand(conditionalStmt.getCondition().accept(this));
+        addCommand(nonPrimitiveToPrimitive(new BoolType()));
         addCommand("ifeq " + labelFalse);
         conditionalStmt.getThenBody().accept(this);
         addCommand("goto " + labelAfter);
@@ -268,11 +269,11 @@ public class CodeGenerator extends Visitor<String> {
         addCommand(print.getArg().accept(this));
         addCommand(nonPrimitiveToPrimitive(argType));
         if (argType instanceof IntType)
-            addCommand("invokevirtual java/io/PrintStream/print(I)V");
+            addCommand("invokevirtual java/io/PrintStream/println(I)V");
         if (argType instanceof BoolType)
-            addCommand("invokevirtual java/io/PrintStream/print(Z)V");
+            addCommand("invokevirtual java/io/PrintStream/println(Z)V");
         if (argType instanceof StringType)
-            addCommand("invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V");
+            addCommand("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");
 
         //todo for list printing
         return null;
@@ -336,8 +337,11 @@ public class CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(ListSize listSize) {
-        //todo
-        return null;
+        String commands = "";
+        commands += listSize.getInstance().accept(this);
+        commands += "invokevirtual List/getSize()I\n";
+        commands += primitiveToNonPrimitive(new IntType());
+        return commands;
     }
 
     @Override
@@ -405,12 +409,6 @@ public class CodeGenerator extends Visitor<String> {
         for (Expression element: elements) {
             commands += "aload " + tempIndex + "\n";
             commands += element.accept(this);
-            Type elementType = element.accept(expressionTypeChecker);
-            if(elementType instanceof IntType)
-                commands += "invokestatic java/lang/Integer/valueOf(I)Ljava/lang/Integer;\n";
-            if(elementType instanceof BoolType)
-                commands += "invokestatic java/lang/Boolean/valueOf(Z)Ljava/lang/Boolean;\n";
-
             commands += "invokevirtual java/util/ArrayList/add(Ljava/lang/Object;)Z\n";
             commands += "pop\n";
         }
@@ -447,7 +445,6 @@ public class CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(VoidValue voidValue) {
-        //todo
-        return null;
+        return "";
     }
 }

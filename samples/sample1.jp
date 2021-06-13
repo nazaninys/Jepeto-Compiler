@@ -1,7 +1,13 @@
-main : print(f(5));
+main : f();
 
-func f(a):
-    return a;
+func f():{
+    if(false):
+        print("hello");
+    else:
+        print("bye");
+        print("hi");
+    return void;
+    }
 
 func g():
     return true;

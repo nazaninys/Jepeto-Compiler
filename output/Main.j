@@ -12,7 +12,6 @@
 .limit locals 128
 		aload 0
 		invokespecial java/lang/Object/<init>()V
-		getstatic java/lang/System/out Ljava/io/PrintStream;
 		new Fptr
 		dup
 		aload 0
@@ -23,20 +22,31 @@
 		invokespecial java/util/ArrayList/<init>()V
 		astore 1
 		aload 1
-		ldc 5
-		invokestatic java/lang/Integer/valueOf(I)Ljava/lang/Integer;
-		invokevirtual java/util/ArrayList/add(Ljava/lang/Object;)Z
-		pop
-		aload 1
 		invokevirtual Fptr/invoke(Ljava/util/ArrayList;)Ljava/lang/Object;
-		checkcast java/lang/Integer
-		invokevirtual java/lang/Integer/intValue()I
-		invokevirtual java/io/PrintStream/print(I)V
+		pop
 		return
 .end method
-.method public f(Ljava/lang/Integer;)Ljava/lang/Integer;
+.method public f()V
 .limit stack 128
 .limit locals 128
-		aload 1
-		areturn
+		ldc 0
+		invokestatic java/lang/Boolean/valueOf(Z)Ljava/lang/Boolean;
+		invokevirtual java/lang/Boolean/booleanValue()Z
+		ifeq Label_0
+		getstatic java/lang/System/out Ljava/io/PrintStream;
+		ldc "hello"
+		
+		invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+		goto Label_1
+	Label_0:
+		getstatic java/lang/System/out Ljava/io/PrintStream;
+		ldc "bye"
+		
+		invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+	Label_1:
+		getstatic java/lang/System/out Ljava/io/PrintStream;
+		ldc "hi"
+		
+		invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+		return
 .end method
