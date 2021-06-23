@@ -6,4 +6,3 @@ Generated: List.class
 Generated: Main.class
 
 ---------------------------Output---------------------------
-[1,2,7,8,]

@@ -28,10 +28,14 @@ public class CodeGenerator extends Visitor<String> {
     private final String outputPath;
     private FileWriter mainFile;
     private final ExpressionTypeChecker expressionTypeChecker;
-    private Set<String> visited;
+    private final Set<String> visited;
     private int numOfUsedTemp = 0;
     private int numOfUsedLabel = 0;
     private FunctionDeclaration curFuncDec;
+
+    private Map<String, String> anonymousFunctionsBodies = new LinkedHashMap<>();
+    private String curAnonymousFunctionBody = "";
+    private boolean isInAnonymousFunctionBody = false;
 
     public CodeGenerator(ExpressionTypeChecker expressionTypeChecker, Set<String> visited) {
         this.expressionTypeChecker = expressionTypeChecker;
@@ -84,6 +88,10 @@ public class CodeGenerator extends Visitor<String> {
     }
 
     private void addCommand(String command) {
+        if(isInAnonymousFunctionBody){
+            curAnonymousFunctionBody += command + "\n";
+            return;
+        }
         try {
             command = String.join("\n\t\t", command.split("\n"));
             if(command.startsWith("Label_"))
@@ -180,6 +188,12 @@ public class CodeGenerator extends Visitor<String> {
             funcDec.accept(this);
             numOfUsedTemp = 0;
         }
+
+        for(String key : anonymousFunctionsBodies.keySet()){
+            if (! visited.contains(key))
+                continue;
+            addCommand(anonymousFunctionsBodies.get(key));
+        }
         return null;
     }
 
@@ -192,7 +206,7 @@ public class CodeGenerator extends Visitor<String> {
             FunctionSymbolTableItem functionSymbolTableItem = (FunctionSymbolTableItem) SymbolTable.root.getItem(searchKey);
             argTypes = functionSymbolTableItem.getArgTypes();
             returnType = functionSymbolTableItem.getReturnType();
-        }catch (ItemNotFoundException e){
+        }catch (ItemNotFoundException e){ //unreachable
         }
 
         String header = "";
@@ -335,6 +349,7 @@ public class CodeGenerator extends Visitor<String> {
         }
         else {
             addCommand( returnStmt.getReturnedExpr().accept(this) );
+            addCommand(primitiveToNonPrimitive(type));
             addCommand("areturn");
         }
         return null;
@@ -464,8 +479,48 @@ public class CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(AnonymousFunction anonymousFunction) {
-        //todo
-        return null;
+        String commands = "";
+        String searchKey = FunctionSymbolTableItem.START_KEY + anonymousFunction.getName();
+        Map<String, Type> argTypes = new LinkedHashMap<>();
+        Type returnType = new VoidType();
+        try {
+            FunctionSymbolTableItem functionSymbolTableItem = (FunctionSymbolTableItem) SymbolTable.root.getItem(searchKey);
+            argTypes = functionSymbolTableItem.getArgTypes();
+            returnType = functionSymbolTableItem.getReturnType();
+        }catch (ItemNotFoundException e){ //unreachable
+        }
+
+        String header = "";
+        header += ".method public " + anonymousFunction.getName() + "(";
+        for(Identifier arg : anonymousFunction.getArgs()){
+            header += "L" + makeTypeSignature(argTypes.get(arg.getName())) + ";";
+        }
+        if (returnType instanceof VoidType)
+            header += ")V";
+        else
+            header += ")L"  + makeTypeSignature(returnType) + ";";
+
+        commands += header + "\n";
+        commands += ".limit stack 128\n";
+        commands += ".limit locals 128\n";
+
+        curAnonymousFunctionBody = "";
+        isInAnonymousFunctionBody = true;
+        anonymousFunction.getBody().accept(this);
+        isInAnonymousFunctionBody = false;
+
+        commands += curAnonymousFunctionBody + "\n";
+        commands += ".end method\n";
+        commands = commands.replace("\n\n", "\n");
+        anonymousFunctionsBodies.put(anonymousFunction.getName(), commands);
+
+        commands = "";
+        commands += "new Fptr\n";
+        commands += "dup\n";
+        commands += "aload 0\n";
+        commands += "ldc \"" + anonymousFunction.getName() + "\"\n";
+        commands += "invokespecial Fptr/<init>(Ljava/lang/Object;Ljava/lang/String;)V\n";
+        return commands;
     }
 
     @Override
@@ -527,6 +582,7 @@ public class CodeGenerator extends Visitor<String> {
         }
 
         commands += funcCall.getInstance().accept(this);
+
         commands += "new java/util/ArrayList\n";
         commands += "dup\n";
         commands += "invokespecial java/util/ArrayList/<init>()V\n";

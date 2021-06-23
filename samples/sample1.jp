@@ -1,13 +1,5 @@
-main : print([1,2]::7::8);
+main : f();
 
-func f(a, b, c):{
-    if(~true):
-        print("hello");
-    else:
-        print([1, 2, 3, 4][a+b+c]);
-        print(~true);
-    return void;
-    }
-
-func g():
-    return true;
+func f():{
+    return ()->{return 1;};
+}
