@@ -19,10 +19,7 @@ import main.visitor.Visitor;
 import main.visitor.type.ExpressionTypeChecker;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class CodeGenerator extends Visitor<String> {
     private final String outputPath;
@@ -184,7 +181,6 @@ public class CodeGenerator extends Visitor<String> {
         for(FunctionDeclaration funcDec : program.getFunctions()){
             if (! visited.contains(funcDec.getFunctionName().getName()))
                 continue;
-            curFuncDec = funcDec;
             funcDec.accept(this);
             numOfUsedTemp = 0;
         }
@@ -198,12 +194,14 @@ public class CodeGenerator extends Visitor<String> {
     }
 
     @Override
-        public String visit(FunctionDeclaration funcDeclaration) {
+    public String visit(FunctionDeclaration funcDeclaration) {
         String searchKey = FunctionSymbolTableItem.START_KEY + funcDeclaration.getFunctionName().getName();
         Map<String, Type> argTypes = new LinkedHashMap<>();
         Type returnType = new VoidType();
+        curFuncDec = funcDeclaration;
         try {
             FunctionSymbolTableItem functionSymbolTableItem = (FunctionSymbolTableItem) SymbolTable.root.getItem(searchKey);
+            expressionTypeChecker.setCurFunction(functionSymbolTableItem);
             argTypes = functionSymbolTableItem.getArgTypes();
             returnType = functionSymbolTableItem.getReturnType();
         }catch (ItemNotFoundException e){ //unreachable
@@ -574,11 +572,26 @@ public class CodeGenerator extends Visitor<String> {
         FptrType fptrType = (FptrType) funcCall.getInstance().accept(expressionTypeChecker);
         String searchKey = FunctionSymbolTableItem.START_KEY + fptrType.getFunctionName();
         Type retType = new VoidType(); // just for initialize
+        ArrayList<Expression> args = new ArrayList<>();
+        FunctionSymbolTableItem functionSymbolTableItem = null;
 
         try {
-            FunctionSymbolTableItem functionSymbolTableItem = (FunctionSymbolTableItem)SymbolTable.root.getItem(searchKey);
+            functionSymbolTableItem = (FunctionSymbolTableItem)SymbolTable.root.getItem(searchKey);
             retType = functionSymbolTableItem.getReturnType();
         }catch (ItemNotFoundException e){ //unreachable
+        }
+
+        if (funcCall.getArgsWithKey().size() > 0){
+            for (Identifier argName : functionSymbolTableItem.getFuncDeclaration().getArgs()){
+                for (Map.Entry<Identifier,Expression> argsWithKey: funcCall.getArgsWithKey().entrySet()) {
+                    if(argsWithKey.getKey().toString().equals(argName.toString())){
+                        args.add(argsWithKey.getValue());
+                    }
+                }
+            }
+        }
+        else{
+            args = funcCall.getArgs();
         }
 
         commands += funcCall.getInstance().accept(this);
@@ -589,7 +602,7 @@ public class CodeGenerator extends Visitor<String> {
         commands += "astore " + tempIndex + "\n";
 
 
-        for(Expression arg : funcCall.getArgs()){
+        for(Expression arg : args){
             commands += "aload " + tempIndex + "\n";
 
             Type argType = arg.accept(expressionTypeChecker);

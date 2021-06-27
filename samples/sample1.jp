@@ -1,5 +1,9 @@
-main : f();
+main : print(g()(1));
 
-func f():{
-    return ()->{return 1;};
+func f(a):{
+    return a + a;
+}
+
+func g():{
+    return f;
 }
