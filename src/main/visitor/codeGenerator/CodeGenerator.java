@@ -29,6 +29,7 @@ public class CodeGenerator extends Visitor<String> {
     private int numOfUsedTemp = 0;
     private int numOfUsedLabel = 0;
     private FunctionDeclaration curFuncDec;
+    private FunctionSymbolTableItem curFuncSTI;
 
     private Map<String, String> anonymousFunctionsBodies = new LinkedHashMap<>();
     private String curAnonymousFunctionBody = "";
@@ -198,9 +199,10 @@ public class CodeGenerator extends Visitor<String> {
         String searchKey = FunctionSymbolTableItem.START_KEY + funcDeclaration.getFunctionName().getName();
         Map<String, Type> argTypes = new LinkedHashMap<>();
         Type returnType = new VoidType();
-        curFuncDec = funcDeclaration;
         try {
             FunctionSymbolTableItem functionSymbolTableItem = (FunctionSymbolTableItem) SymbolTable.root.getItem(searchKey);
+            curFuncDec = functionSymbolTableItem.getFuncDeclaration();
+            curFuncSTI = functionSymbolTableItem;
             expressionTypeChecker.setCurFunction(functionSymbolTableItem);
             argTypes = functionSymbolTableItem.getArgTypes();
             returnType = functionSymbolTableItem.getReturnType();
@@ -477,12 +479,17 @@ public class CodeGenerator extends Visitor<String> {
 
     @Override
     public String visit(AnonymousFunction anonymousFunction) {
+        FunctionDeclaration tempCurFunc = curFuncDec;
+        FunctionSymbolTableItem tempCurFuncSTI = curFuncSTI;
         String commands = "";
         String searchKey = FunctionSymbolTableItem.START_KEY + anonymousFunction.getName();
         Map<String, Type> argTypes = new LinkedHashMap<>();
         Type returnType = new VoidType();
+
         try {
             FunctionSymbolTableItem functionSymbolTableItem = (FunctionSymbolTableItem) SymbolTable.root.getItem(searchKey);
+            curFuncDec = functionSymbolTableItem.getFuncDeclaration();
+            expressionTypeChecker.setCurFunction(functionSymbolTableItem);
             argTypes = functionSymbolTableItem.getArgTypes();
             returnType = functionSymbolTableItem.getReturnType();
         }catch (ItemNotFoundException e){ //unreachable
@@ -518,6 +525,9 @@ public class CodeGenerator extends Visitor<String> {
         commands += "aload 0\n";
         commands += "ldc \"" + anonymousFunction.getName() + "\"\n";
         commands += "invokespecial Fptr/<init>(Ljava/lang/Object;Ljava/lang/String;)V\n";
+
+        curFuncDec = tempCurFunc;
+        expressionTypeChecker.setCurFunction(curFuncSTI);
         return commands;
     }
 

@@ -6,4 +6,10 @@ Generated: List.class
 Generated: Main.class
 
 ---------------------------Output---------------------------
-2
+4
+true
+3
+[1,2,3,4,]
+Hello
+false
+120
