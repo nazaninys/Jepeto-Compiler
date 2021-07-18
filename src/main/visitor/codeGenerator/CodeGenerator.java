@@ -192,7 +192,7 @@ public class CodeGenerator extends Visitor<String> {
             addCommand(anonymousFunctionsBodies.get(key));
         }
         return null;
-    }
+    }//test
 
     @Override
     public String visit(FunctionDeclaration funcDeclaration) {
@@ -224,10 +224,11 @@ public class CodeGenerator extends Visitor<String> {
         addCommand(".limit locals 128");
 
         funcDeclaration.getBody().accept(this);
+//        addCommand("return");
         addCommand(".end method");
 
         return null;
-    }
+    } //test
 
     @Override
     public String visit(MainDeclaration mainDeclaration) {
@@ -242,8 +243,7 @@ public class CodeGenerator extends Visitor<String> {
         addCommand("return");
         addCommand(".end method");
         return null;
-    }
-
+    } //test
 
     @Override
     public String visit(BlockStmt blockStmt) {
@@ -251,7 +251,7 @@ public class CodeGenerator extends Visitor<String> {
             statement.accept(this);
         }
         return null;
-    } //done
+    } //test
 
     @Override
     public String visit(ConditionalStmt conditionalStmt) {
@@ -275,12 +275,13 @@ public class CodeGenerator extends Visitor<String> {
         addCommand("pop");
         expressionTypeChecker.setFunctioncallStmt(false);
         return null;
-    }
+    } //test
 
     @Override
     public String visit(PrintStmt print) {
         addCommand("getstatic java/lang/System/out Ljava/io/PrintStream;");
         Type argType = print.getArg().accept(expressionTypeChecker);
+        int argSlot = slotOf("");
         String commandsOfArg = print.getArg().accept(this);
         if (argType instanceof ListType){
             addCommand("ldc \"[\"");
@@ -292,6 +293,9 @@ public class CodeGenerator extends Visitor<String> {
             addCommand("istore " + indexSlot);
 
             addCommand(commandsOfArg);
+            addCommand("astore " + argSlot);
+            addCommand("aload " + argSlot);
+
             addCommand("invokevirtual List/getSize()I\n");
             addCommand("istore " + sizeSlot);
 
@@ -304,7 +308,7 @@ public class CodeGenerator extends Visitor<String> {
             addCommand("if_icmpge " + labelAfter);
 
             addCommand("getstatic java/lang/System/out Ljava/io/PrintStream;");
-            addCommand(commandsOfArg);
+            addCommand("aload " + argSlot);
             addCommand("iload " + indexSlot);
             addCommand("invokevirtual List/getElement(I)Ljava/lang/Object;");
             addCommand("checkcast " + makeTypeSignature(new IntType()));
@@ -324,8 +328,16 @@ public class CodeGenerator extends Visitor<String> {
             addCommand("goto " + labelStart);
             addCommand(labelAfter + ":");
 
+            String labelAfter2 = getFreshLabel();
+            addCommand("iload " + sizeSlot);
+            addCommand("ifeq " + labelAfter2);
             addCommand("getstatic java/lang/System/out Ljava/io/PrintStream;");
-            addCommand("ldc \"\b]\"");
+            addCommand("ldc \"\b\"");
+            addCommand("invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V");
+
+            addCommand(labelAfter2 + ":");
+            addCommand("getstatic java/lang/System/out Ljava/io/PrintStream;");
+            addCommand("ldc \"]\"");
             addCommand("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");
 
         }
@@ -339,7 +351,7 @@ public class CodeGenerator extends Visitor<String> {
                 addCommand("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");
         }
         return null;
-    }
+    } //test
 
     @Override
     public String visit(ReturnStmt returnStmt) {
@@ -353,7 +365,7 @@ public class CodeGenerator extends Visitor<String> {
             addCommand("areturn");
         }
         return null;
-    } //done
+    } //test
 
     @Override
     public String visit(BinaryExpression binaryExpression) {
@@ -365,22 +377,22 @@ public class CodeGenerator extends Visitor<String> {
             commands += binaryExpression.getFirstOperand().accept(this);
             commands += binaryExpression.getSecondOperand().accept(this);
             commands += "iadd\n";
-        }
+        } //test
         else if (operator == BinaryOperator.sub) {
             commands += binaryExpression.getFirstOperand().accept(this);
             commands += binaryExpression.getSecondOperand().accept(this);
             commands += "isub\n";
-        }
+        } //test
         else if (operator == BinaryOperator.mult) {
             commands += binaryExpression.getFirstOperand().accept(this);
             commands += binaryExpression.getSecondOperand().accept(this);
             commands += "imul\n";
-        }
+        } //test
         else if (operator == BinaryOperator.div) {
             commands += binaryExpression.getFirstOperand().accept(this);
             commands += binaryExpression.getSecondOperand().accept(this);
             commands += "idiv\n";
-        }
+        } //test
         else if((operator == BinaryOperator.gt) || (operator == BinaryOperator.lt)) {
             commands += binaryExpression.getFirstOperand().accept(this);
             commands += binaryExpression.getSecondOperand().accept(this);
@@ -395,7 +407,7 @@ public class CodeGenerator extends Visitor<String> {
             commands += labelFalse + ":\n";
             commands += "ldc " + "0\n";
             commands += labelAfter + ":\n";
-        }
+        } //test
         else if((operator == BinaryOperator.eq) || (operator == BinaryOperator.neq)) {
             commands += binaryExpression.getFirstOperand().accept(this);
             commands += binaryExpression.getSecondOperand().accept(this);
@@ -480,7 +492,6 @@ public class CodeGenerator extends Visitor<String> {
     @Override
     public String visit(AnonymousFunction anonymousFunction) {
         FunctionDeclaration tempCurFunc = curFuncDec;
-        FunctionSymbolTableItem tempCurFuncSTI = curFuncSTI;
         String commands = "";
         String searchKey = FunctionSymbolTableItem.START_KEY + anonymousFunction.getName();
         Map<String, Type> argTypes = new LinkedHashMap<>();
@@ -550,29 +561,7 @@ public class CodeGenerator extends Visitor<String> {
             commands += nonPrimitiveToPrimitive(type);
         }
         return commands;
-    }
-
-    @Override
-    public String visit(ListAccessByIndex listAccessByIndex) {
-        String commands = "";
-        ListType listType = (ListType)listAccessByIndex.getInstance().accept(expressionTypeChecker);
-
-        commands += listAccessByIndex.getInstance().accept(this);
-        commands += listAccessByIndex.getIndex().accept(this);
-        commands += "invokevirtual List/getElement(I)Ljava/lang/Object;\n";
-
-        commands += "checkcast " + makeTypeSignature(listType.getType()) + "\n";
-        commands += nonPrimitiveToPrimitive(listType.getType());
-        return commands;
-    }
-
-    @Override
-    public String visit(ListSize listSize) {
-        String commands = "";
-        commands += listSize.getInstance().accept(this);
-        commands += "invokevirtual List/getSize()I\n";
-        return commands;
-    }
+    } //test
 
     @Override
     public String visit(FunctionCall funcCall) {
@@ -639,7 +628,30 @@ public class CodeGenerator extends Visitor<String> {
             commands += "checkcast " + makeTypeSignature(retType) + "\n";
         commands += nonPrimitiveToPrimitive(retType);
         return commands;
-    }
+    } //test
+
+    @Override
+    public String visit(ListAccessByIndex listAccessByIndex) {
+        String commands = "";
+        ListType listType = (ListType)listAccessByIndex.getInstance().accept(expressionTypeChecker);
+
+        commands += listAccessByIndex.getInstance().accept(this);
+        commands += listAccessByIndex.getIndex().accept(this);
+        commands += "invokevirtual List/getElement(I)Ljava/lang/Object;\n";
+
+        commands += "checkcast " + makeTypeSignature(listType.getType()) + "\n";
+        commands += nonPrimitiveToPrimitive(listType.getType());
+        return commands;
+    }//test
+
+    @Override
+    public String visit(ListSize listSize) {
+        String commands = "";
+        commands += listSize.getInstance().accept(this);
+        commands += "invokevirtual List/getSize()I\n";
+        return commands;
+    }//test
+
 
     @Override
     public String visit(ListValue listValue) {
@@ -664,14 +676,14 @@ public class CodeGenerator extends Visitor<String> {
         commands += "aload " + tempIndex + "\n";
         commands += "invokespecial List/<init>(Ljava/util/ArrayList;)V\n";
         return commands;
-    }
+    }//test
 
     @Override
     public String visit(IntValue intValue) {
         String commands = "";
         commands += "ldc " + intValue.getConstant() +"\n";
         return commands;
-    } //done
+    }//test
 
     @Override
     public String visit(BoolValue boolValue) {
@@ -681,17 +693,17 @@ public class CodeGenerator extends Visitor<String> {
         else
             commands += "ldc " + "0\n";
         return commands;
-    } //done
+    }//test
 
     @Override
     public String visit(StringValue stringValue) {
         String commands = "";
         commands += "ldc \"" + stringValue.getConstant() + "\"\n";
         return commands;
-    } //done
+    }//test
 
     @Override
     public String visit(VoidValue voidValue) {
         return "";
-    }
+    }//test
 }

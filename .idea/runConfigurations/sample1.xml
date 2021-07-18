@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="sample1" type="Application" factoryName="Application">
-    <output_file path="$PROJECT_DIR$/samples/sample2-ans.txt" is_save="true" />
+    <output_file path="$PROJECT_DIR$/samples/sample1-ans.txt" is_save="true" />
     <option name="MAIN_CLASS_NAME" value="main.Jepeto" />
     <module name="Jepeto-Phase2" />
     <option name="PROGRAM_PARAMETERS" value="samples/sample1.jp" />

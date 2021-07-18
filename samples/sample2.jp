@@ -1,30 +1,24 @@
-main : k(155, true, "str");
+main : start(true, 20 + 6 * 4);
 
-func f(a, b) : {
-    print([a, b, a, b, b, b][b] * -2);
-    return 13;
-}
-
-func g() : {
-    return f;
-}
-
-func h():{
+func start(a, b) : {
+    if (~a or b > 100) :
+        if (a) :
+            print(b / 30);
+        else :
+            print(b *30);
+    print(anms()("hi", false));
     return void;
 }
 
-func r():{
-    return ()->{print("PLC_1400");return "CLP";};
+func anms() : {
+    printList(["str", "stri", "strin", "string"], 0);
+    return (a, b) -> {print(a); return (true or false and ~true is b);};
 }
 
-func k(arg1, arg2, arg3) :{
-    h();
-    g()(arg1, 2);
-    if (~arg2):
-        return arg3;
-    else:
-        print((a, b)->{print(a);print(f(20, 1));return 1;}(arg3, arg3));
-
-    r()();
-    return "true";
+func printList(arg, j) : {
+    if j is 4:
+        return void;
+    print(arg[j]);
+    printList(arg, j + 1);
+    return void;
 }

@@ -1,19 +1,25 @@
-main : print(g(2, 1) + 8);
+main : start(true, 20 + 6 * 4);
 
-func f(a, b) : {
-   print(a + b * a);
-   print(true);
-   print([10, 11, 12].size);
-   print([1, 2, 3]::4);
-   if (a > b):
-        print("Hello");
-   else:
-        print("Bye");
-   return [1,2,3,4,10][3];
+func start(a, b) : {
+    if (~a or b > 100) :
+        if (a) :
+            print(b / 30);
+        else :
+            print(b *30);
+    print(anms()("hi", false));
+    return void;
 }
 
-func g(a, b) : {
-    print(f(a, b) is 10);
-    return 100 / 2 + 7 * 10 - 8;
-    print("unreachable");
+func anms() : {
+    printList([11, 13, 17, 19], 0);
+    return (a, b) -> {print(a); return (true or false and ~true is b);};
+}
+
+func printList(arg, j) : {
+    if j is 4:
+        return void;
+    print(arg[j]);
+    printList(arg, j + 1);
+    print(arg::j);
+    return void;
 }
